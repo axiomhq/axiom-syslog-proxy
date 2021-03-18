@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/axiomhq/axiom-syslog-proxy/input"
+	"github.com/axiomhq/axiom-syslog-proxy/parser"
 )
 
 var (
@@ -29,13 +30,23 @@ func main() {
 		}
 	*/
 
-	closer, err := input.StartUDP(*addrUDP, onInput)
+	tcpParser := parser.New(func(msg *parser.Log) {
+		fmt.Printf("tcp ")
+		msg.PrettyPrint()
+	})
+
+	udpParser := parser.New(func(msg *parser.Log) {
+		fmt.Printf("udp ")
+		msg.PrettyPrint()
+	})
+
+	closer, err := input.StartTCP(*addrTCP, tcpParser.WriteLine)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer closer.Close()
 
-	closer, err = input.StartTCP(*addrTCP, onInput)
+	closer, err = input.StartUDP(*addrUDP, udpParser.WriteLine)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,8 +60,4 @@ func main() {
 	*/
 
 	time.Sleep(time.Second * 60)
-}
-
-func onInput(line []byte, remoteIP string) {
-	fmt.Println(string(line), "from", remoteIP)
 }
