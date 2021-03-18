@@ -26,9 +26,8 @@ type Server struct {
 	tcpParser parser.Parser
 	udpParser parser.Parser
 
-	queue     []axiom.Event
-	flushChan chan struct{}
-	mu        sync.RWMutex
+	queue []axiom.Event
+	mu    sync.RWMutex
 }
 
 func NewServer(config *Config) (*Server, error) {
@@ -38,10 +37,9 @@ func NewServer(config *Config) (*Server, error) {
 	}
 
 	srv := &Server{
-		config:    config,
-		client:    client,
-		queue:     make([]axiom.Event, 0, maxQueueSize),
-		flushChan: make(chan struct{}),
+		config: config,
+		client: client,
+		queue:  make([]axiom.Event, 0, maxQueueSize),
 	}
 
 	srv.tcpParser = parser.New(srv.onLogMessage)
@@ -62,10 +60,12 @@ func NewServer(config *Config) (*Server, error) {
 func (srv *Server) onLogMessage(log *parser.Log) {
 	ev := logToEvent(log)
 	srv.mu.Lock()
-	defer srv.mu.Unlock()
 	srv.queue = append(srv.queue, ev)
-	if len(srv.queue) >= maxQueueSize {
-		srv.flushChan <- struct{}{}
+	needsFlushing := len(srv.queue) >= maxQueueSize
+	srv.mu.Unlock()
+
+	if needsFlushing {
+		srv.Flush()
 	}
 }
 
@@ -101,10 +101,15 @@ func (srv *Server) Flush() error {
 	srv.mu.Lock()
 	defer srv.mu.Unlock()
 
+	if len(srv.queue) == 0 {
+		return nil
+	}
+
 	status, err := srv.client.Datasets.IngestEvents(ctx, srv.config.Dataset, axiom.IngestOptions{}, srv.queue...)
 	if logger.IsError(err) {
 		return err
 	}
+
 	logger.Trace("ingested %d event(s)", status.Ingested)
 	srv.queue = make([]axiom.Event, 0, maxQueueSize)
 	return nil
@@ -125,11 +130,7 @@ func (srv *Server) Run() {
 		case <-done:
 			return
 		case <-ticker.C:
-			srv.flushChan <- struct{}{}
-		case <-srv.flushChan:
-			if err := srv.Flush(); err != nil {
-				logger.Error(err.Error())
-			}
+			srv.Flush()
 		}
 	}
 }
