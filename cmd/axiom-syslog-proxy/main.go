@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/axiomhq/axiom-go/axiom"
-	"github.com/axiomhq/axiom-loki-proxy/version"
 )
 
 var (
@@ -17,8 +16,6 @@ var (
 )
 
 func main() {
-	log.Print("starting axiom-loki-proxy version", version.Release())
-
 	flag.Parse()
 
 	if deploymentURL == "" {

@@ -476,35 +476,11 @@ func (s *ParseTestSuite) TestParse() {
 			},
 		},
 		&Case{
-			raw:         []byte(`<6>1 2019-03-05T11:43:58.269462953Z axiom /var/log/dpkg.log - - [watchly@0 watchly.agentId="127-0-0-1" watchly.originalMessage="  This response was from IP 192.168.86.90, reporting an IP address of 192.168.86.90."]`),
-			time:        time.Date(2019, 3, 5, 11, 43, 58, 269462953, time.UTC),
-			hostname:    "axiom",
-			application: "dpkg",
-			text:        "  This response was from IP 192.168.86.90, reporting an IP address of 192.168.86.90.",
-			metadata: map[string]interface{}{
-				"watchly.logfile": "/var/log/dpkg.log",
-			},
-		},
-		&Case{
 			raw:         []byte(`<6> Mar  7 05:45:39 eth systemd[1]: Starting Message of the Day...`),
 			time:        time.Date(time.Now().Year(), 3, 7, 5, 45, 39, 0, time.UTC),
 			hostname:    "eth",
 			application: "systemd",
 			text:        "Starting Message of the Day...",
-		},
-		&Case{
-			raw:         []byte(`<6>1 2019-03-05T11:43:58.269462953Z eth /var/log/syslog.1 - - [watchly@0 watchly.agentId="127-0-0-1" watchly.originalMessage="Mar  7 05:45:39 eth kernel[1]: Starting Message of the Day..."]`),
-			time:        time.Date(2019, 3, 5, 11, 43, 58, 269462953, time.UTC),
-			hostname:    "eth",
-			application: "kernel",
-			text:        "Starting Message of the Day...",
-		},
-		&Case{
-			raw:         []byte(`<6>1 2020-01-07T05:40:09.48624778-06:00 127.0.0.1 unknown - - [watchly@10 watchly.originalMessage="X-Axiom-Internal-Monitors - monitorID=\"24b153c0-9548-48da-a607-fe4bb4ac8e1c\" metricName=\"\" triggeredState=\"none\""]`),
-			time:        time.Date(2020, 1, 7, 11, 40, 9, 486247780, time.UTC),
-			hostname:    "127.0.0.1",
-			application: "unknown",
-			text:        "X-Axiom-Internal-Monitors - monitorID=\"24b153c0-9548-48da-a607-fe4bb4ac8e1c\" metricName=\"\" triggeredState=\"none\"",
 		},
 	}
 
@@ -596,23 +572,6 @@ func (s *ParseTestSuite) TestRFC3164NoTimeOrHost() {
 	assert.Equal("214", msg.Metadata["SequenceID"])
 	assert.Equal(time.Now().UTC().Day(), time.Unix(0, msg.Timestamp).UTC().Day())
 	assert.Equal("'su root' failed for lonvick on /dev/pts/8", msg.Text)
-}
-
-func (s *ParseTestSuite) TestPacketWithNulls() {
-	const msgTmpl = `<6>1 2019-03-05T11:43:58.269Z eth /var/log/btmp - - [watchly@0 watchly.agentId="127-0-0-1" watchly.originalMessage="%s"]`
-	raw := fmt.Sprintf(msgTmpl, "ssh:notty\x00helpdesk\x00151.77.148.57")
-	msg := ParseLineWithFallback([]byte(raw), "127.0.0.1")
-	s.NotNil(msg)
-	s.Equal("ssh:notty", msg.Text)
-
-	raw = "<15> redis: \xef\xbb\xbfutf8\x00isbom"
-	msg = ParseLineWithFallback([]byte(raw), "127.0.0.1")
-	s.NotNil(msg)
-	s.Equal("utf8", msg.Text)
-
-	raw = "<15> redis: \x00weirdness"
-	msg = ParseLineWithFallback([]byte(raw), "127.0.0.1")
-	s.Nil(msg)
 }
 
 func (s *ParseTestSuite) TestSynthetic() {
@@ -743,16 +702,6 @@ func BenchmarkDateParse(b *testing.B) {
 
 func BenchmarkNoDateParse(b *testing.B) {
 	raw := []byte("<13>host app[24]: this is the message")
-	for i := 0; i < b.N; i++ {
-		msg, _ := parseLine(raw)
-		if msg == nil {
-			panic(errors.New("Unable to parse message"))
-		}
-	}
-}
-
-func BenchmarkAgentParse(b *testing.B) {
-	raw := []byte(`<6>1 2019-03-05T11:43:58.269462953Z axiom /var/log/dpkg.log - - [watchly@0 watchly.agentId="127-0-0-1" watchly.originalMessage="  This response was from IP 192.168.86.90, reporting an IP address of 192.168.86.90."]`)
 	for i := 0; i < b.N; i++ {
 		msg, _ := parseLine(raw)
 		if msg == nil {
