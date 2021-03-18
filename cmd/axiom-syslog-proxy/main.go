@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
+	"time"
 
-	"github.com/axiomhq/axiom-go/axiom"
+	"github.com/axiomhq/axiom-syslog-proxy/input"
 )
 
 var (
@@ -18,17 +20,37 @@ var (
 func main() {
 	flag.Parse()
 
-	if deploymentURL == "" {
-		log.Fatal("missing AXIOM_DEPLOYMENT_URL")
-	}
-	if accessToken == "" {
-		log.Fatal("missing AXIOM_ACCESS_TOKEN")
-	}
+	/*
+		if deploymentURL == "" {
+			log.Fatal("missing AXIOM_DEPLOYMENT_URL")
+		}
+		if accessToken == "" {
+			log.Fatal("missing AXIOM_ACCESS_TOKEN")
+		}
+	*/
 
-	client, err := axiom.NewClient(deploymentURL, accessToken)
+	closer, err := input.StartUDP(*addrUDP, onInput)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer closer.Close()
 
-	// NOW WHAT?
+	closer, err = input.StartTCP(*addrTCP, onInput)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer closer.Close()
+
+	/*
+		_, err = axiom.NewClient(deploymentURL, accessToken)
+		if err != nil {
+			log.Fatal(err)
+		}
+	*/
+
+	time.Sleep(time.Second * 60)
+}
+
+func onInput(line []byte, remoteIP string) {
+	fmt.Println(string(line), "from", remoteIP)
 }
