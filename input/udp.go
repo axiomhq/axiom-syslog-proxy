@@ -7,18 +7,6 @@ import (
 
 // StartUDP ...
 func StartUDP(addr string, cb WriteLineFunc) (io.Closer, error) {
-	/*
-		raddr, err := net.ResolveUDPAddr("udp", addr)
-		if err != nil {
-			return nil, err
-		}
-
-		conn, err := net.DialUDP("udp", raddr, raddr)
-		if err != nil {
-			return nil, err
-		}
-	*/
-
 	conn, err := net.ListenPacket("udp", addr)
 	if err != nil {
 		return nil, err

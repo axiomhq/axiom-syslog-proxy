@@ -380,11 +380,11 @@ func (s *ParseTestSuite) TestParse() {
 			metadata:    map[string]interface{}{"exampleSDID.iut": "3", "examplePriority.class": "high_class", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "App\"lication]"},
 		},
 		{
-			raw:           []byte("<7>1 2006-10-29T01:59:59.156Z mymachine.example.com evntslog - ID47 - Running executor with --project=watchly .env=development"),
+			raw:           []byte("<7>1 2006-10-29T01:59:59.156Z mymachine.example.com evntslog - ID47 - Running executor with --project=axiom .env=development"),
 			time:          time.Date(2006, 10, 29, 1, 59, 59, 156000000, time.UTC),
 			hostname:      "mymachine.example.com",
 			application:   "evntslog",
-			text:          "Running executor with --project=watchly .env=development",
+			text:          "Running executor with --project=axiom .env=development",
 			metadataLTLen: 1,
 		},
 		{
@@ -542,8 +542,8 @@ func (s *ParseTestSuite) TestRFC3164Dates() {
 		if f.isUTC {
 			loc = time.UTC
 		}
-		expectedTs := time.Date(time.Now().Year(), time.October, 1, 22, 14, 15, 0, loc)
-		assert.Equal(expectedTs, time.Unix(0, msg.Timestamp).In(expectedTs.Location()), str)
+		expectedTS := time.Date(time.Now().Year(), time.October, 1, 22, 14, 15, 0, loc)
+		assert.Equal(expectedTS, time.Unix(0, msg.Timestamp).In(expectedTS.Location()), str)
 		assert.Equal("mymachine", msg.Hostname, str)
 		assert.Equal("very.large.syslog.message.tag", msg.Application, str)
 		assert.Equal("'su root' failed for lonvick on /dev/pts/8", msg.Text, str)
@@ -600,7 +600,8 @@ func (s *ParseTestSuite) TestFuzzCrashers() {
 	}
 
 	for _, data := range payloads {
-		parseLine(data)
+		_, err := parseLine(data)
+		s.Error(err)
 	}
 }
 
@@ -653,16 +654,6 @@ func Benchmark5424(b *testing.B) {
 			panic(errors.New("Unable to parse message"))
 		}
 	}
-}
-
-type fakeSynchronizer struct {
-}
-
-func (s *fakeSynchronizer) Add(hostname, ip string) {
-}
-
-func (s *fakeSynchronizer) Flush() error {
-	return nil
 }
 
 func BenchmarkParserDifferentMetadataTypes(b *testing.B) {

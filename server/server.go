@@ -8,9 +8,10 @@ import (
 	"time"
 
 	"github.com/axiomhq/axiom-go/axiom"
+	"github.com/axiomhq/logmanager"
+
 	"github.com/axiomhq/axiom-syslog-proxy/input"
 	"github.com/axiomhq/axiom-syslog-proxy/parser"
-	"github.com/axiomhq/logmanager"
 )
 
 var logger = logmanager.GetLogger("server.server")

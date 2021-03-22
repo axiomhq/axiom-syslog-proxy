@@ -191,7 +191,7 @@ func parseRFC3164(msg *Log, data []byte, length int) error {
 	i := 0
 	l := length
 
-	if parsePriority(msg, data, &i, &l) == false {
+	if !parsePriority(msg, data, &i, &l) {
 		return errParse
 	}
 
@@ -204,7 +204,7 @@ func parseRFC3164(msg *Log, data []byte, length int) error {
 		msg.Timestamp = time.Now().UnixNano()
 	}
 
-	/* Expected: `hostname program[pid]:` though both are optional */
+	// Expected: `hostname program[pid]:` though both are optional
 	parseHostname(msg, data, &i, &l)
 	skipChar(data, &i, &l, ' ', -1)
 	parse3164Application(msg, data, &i, &l)
@@ -232,37 +232,37 @@ func parseRFC5424(msg *Log, data []byte, length int) error {
 	i := 0
 	l := length
 
-	if parsePriority(msg, data, &i, &l) == false || parseVersion(msg, data, &i, &l) == false {
+	if !parsePriority(msg, data, &i, &l) || parseVersion(data, &i, &l) {
 		return errParse
 	}
 
-	if skipSpace(data, &i, &l) == false {
+	if !skipSpace(data, &i, &l) {
 		return errParse
 	}
 
-	if parseDate(msg, dateFormatISO, data, &i, &l) == false {
+	if !parseDate(msg, dateFormatISO, data, &i, &l) {
 		return errParse
 	}
 
 	parseHostname(msg, data, &i, &l)
-	if skipSpace(data, &i, &l) == false {
+	if !skipSpace(data, &i, &l) {
 		return errParse
 	}
 
 	msg.Application = string(parseColumn(data, &i, &l))
-	if skipSpace(data, &i, &l) == false {
+	if !skipSpace(data, &i, &l) {
 		return errParse
 	}
 
 	// procid
 	parseColumn(data, &i, &l)
-	if skipSpace(data, &i, &l) == false {
+	if !skipSpace(data, &i, &l) {
 		return errParse
 	}
 
 	// msgid
 	parseColumn(data, &i, &l)
-	if skipSpace(data, &i, &l) == false {
+	if !skipSpace(data, &i, &l) {
 		return errParse
 	}
 
@@ -279,7 +279,7 @@ func parseRFC5424(msg *Log, data []byte, length int) error {
 				}
 
 				var prefix string
-				if strings.HasPrefix(sdID, "watchly") {
+				if strings.HasPrefix(sdID, "axiom") {
 					prefix = ""
 				} else if idx := strings.IndexRune(sdID, '@'); idx > 0 {
 					prefix = sdID[0:idx] + "."
@@ -378,13 +378,13 @@ func skipSpace(data []byte, index *int, length *int) bool {
 	return false
 }
 
-func parseVersion(msg *Log, data []byte, index *int, length *int) bool {
+func parseVersion(data []byte, index *int, length *int) bool {
 	i := *index
 	l := *length
 	var version int32
 
 	for l > 0 && data[i] != ' ' {
-		if unicode.IsDigit(rune(data[i])) == true {
+		if unicode.IsDigit(rune(data[i])) {
 			version = version*10 + (rune(data[i]) - '0')
 		} else {
 			return false
@@ -454,7 +454,7 @@ func parse3164Application(msg *Log, data []byte, index *int, length *int) bool {
 	return true
 }
 
-func parseHostname(msg *Log, data []byte, index *int, length *int) bool {
+func parseHostname(msg *Log, data []byte, index *int, length *int) {
 	i := *index
 	l := *length
 
@@ -465,14 +465,13 @@ func parseHostname(msg *Log, data []byte, index *int, length *int) bool {
 
 	if data[i-1] == ':' || data[i-1] == ']' {
 		// If we encounter this, we're actually parsing the application
-		return false
+		return
 	}
 
 	msg.Hostname = string(data[*index:i])
 
 	*index = i
 	*length = l
-	return true
 }
 
 func parseDate(msg *Log, dateFormat dateFormatType, data []byte, index *int, length *int) bool {
@@ -656,22 +655,19 @@ scannerLoop:
 	return nil, errParse
 }
 
-func skipChar(data []byte, index *int, length *int, char byte, maxSkip int) int {
+func skipChar(data []byte, index *int, length *int, char byte, maxSkip int) {
 	i := *index
 	l := *length
-	var nSkipped int
 
 	for maxSkip != 0 && l > 0 && data[i] == char {
 		i++
 		l--
-		nSkipped++
 		if maxSkip >= 0 {
 			maxSkip--
 		}
 	}
 	*index = i
 	*length = l
-	return nSkipped
 }
 
 func processText(data []byte) (bool, string) {
@@ -719,7 +715,7 @@ func parseSequenceID(msg *Log, data []byte, index *int, length *int) bool {
 	l := *length
 
 	for l > 0 && data[i] != ':' {
-		if unicode.IsDigit(rune(data[i])) == false {
+		if !unicode.IsDigit(rune(data[i])) {
 			return false
 		}
 		i++

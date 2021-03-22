@@ -11,14 +11,11 @@ import (
 )
 
 const (
-	agentIDKey              = "watchly.agentId"
-	agentOriginalMessageKey = "watchly.originalMessage"
-	logfileKey              = "watchly.logfile"
-	maxNestLevel            = 5
+	logfileKey   = "axiom.logfile"
+	maxNestLevel = 5
 )
 
 var (
-	syslogRegex   = regexp.MustCompile(`^<\d{1,3}>[0-9A-z]?`)
 	timestampKeys = map[string]bool{"syslog.timestamp": true, "timestamp": true, "eventtime": true, "@timestamp": true, "_timestamp": true, "date": true, "published_date": true}
 	hostKeys      = map[string]bool{"syslog.hostname": true, "hostname": true, "host": true}
 	appKeys       = map[string]bool{"syslog.appname": true, "app": true, "application": true}
@@ -143,17 +140,19 @@ func extractMetadataValue(concatKey string, value []byte, dataType jsonparser.Va
 
 	switch dataType {
 	case jsonparser.Object:
-		level += 1
-		jsonparser.ObjectEach(value, func(kk []byte, vv []byte, dtdt jsonparser.ValueType, offset int) error {
+		level++
+		if err := jsonparser.ObjectEach(value, func(kk []byte, vv []byte, dtdt jsonparser.ValueType, offset int) error {
 			if err := extractMetadataValue(joinKey(concatKey, string(kk)), vv, dtdt, level, msg); err != nil {
 				return err
 			}
 			return nil
-		})
+		}); err != nil {
+			return err
+		}
 	case jsonparser.Array:
 		arrayIndex := 0
-		level += 1
-		jsonparser.ArrayEach(value, func(vv []byte, dtdt jsonparser.ValueType, offset int, err error) {
+		level++
+		if _, err := jsonparser.ArrayEach(value, func(vv []byte, dtdt jsonparser.ValueType, offset int, err error) {
 			if err != nil {
 				return
 			}
@@ -161,8 +160,10 @@ func extractMetadataValue(concatKey string, value []byte, dataType jsonparser.Va
 			if err := extractMetadataValue(newConcatKey, vv, dtdt, level, msg); err != nil {
 				return
 			}
-			arrayIndex += 1
-		})
+			arrayIndex++
+		}); err != nil {
+			return err
+		}
 	case jsonparser.Number:
 		if n, err := ParseInt(value); err == nil {
 			msg.Metadata[concatKey] = n
