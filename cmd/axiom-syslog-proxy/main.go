@@ -1,8 +1,3 @@
-//
-// Quick CLI test:
-//    echo -n "udp message" | nc -u -w1 localhost 514
-//    echo -n “tcp message” | nc -u -w1 localhost 601
-
 package main
 
 import (
@@ -10,29 +5,33 @@ import (
 	"log"
 	"os"
 
+	"github.com/axiomhq/pkg/version"
+
 	"github.com/axiomhq/axiom-syslog-proxy/server"
 )
 
 var (
 	deploymentURL = os.Getenv("AXIOM_DEPLOYMENT_URL")
+	ingestToken   = os.Getenv("AXIOM_ACCESS_TOKEN")
 	ingestDataset = os.Getenv("AXIOM_INGEST_DATASET")
-	ingestToken   = os.Getenv("AXIOM_INGEST_TOKEN")
 
-	addrUDP = flag.String("addr-udp", ":514", "Listen address <ip>:<port>")
 	addrTCP = flag.String("addr-tcp", ":601", "Listen address <ip>:<port>")
+	addrUDP = flag.String("addr-udp", ":514", "Listen address <ip>:<port>")
 )
 
 func main() {
+	log.Print("starting axiom-syslog-proxy version ", version.Release())
+
 	flag.Parse()
 
 	if deploymentURL == "" {
 		log.Fatal("missing AXIOM_DEPLOYMENT_URL")
 	}
+	if ingestToken == "" {
+		log.Fatal("missing AXIOM_ACCESS_TOKEN")
+	}
 	if ingestDataset == "" {
 		log.Fatal("missing AXIOM_INGEST_DATASET")
-	}
-	if ingestToken == "" {
-		log.Fatal("missing AXIOM_INGEST_TOKEN")
 	}
 
 	config := &server.Config{
@@ -45,7 +44,8 @@ func main() {
 
 	srv, err := server.NewServer(config)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
+
 	srv.Run()
 }
