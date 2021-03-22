@@ -37,9 +37,7 @@ func (p *parser) WriteLine(line []byte, remoteIP string) {
 	// we'll be able to:
 	// a) Be able to take into account the specific log parsing settings of the instance and,
 	// b) Intiialize & involve integrations for parsing specific log types
-
 	if msg := ParseLineWithFallback(line, remoteIP); msg != nil {
-
 		if msg.Text == "" {
 			return
 		}
