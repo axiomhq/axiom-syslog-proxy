@@ -30,6 +30,7 @@ type Case struct {
 	metadataLTLen int
 	imprecise     bool
 	severity      int64
+	adjust        bool
 }
 
 func (s *ParseTestSuite) TestParseJson() {
@@ -481,6 +482,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "eth",
 			application: "systemd",
 			text:        "Starting Message of the Day...",
+			adjust:      true,
 		},
 	}
 
@@ -490,7 +492,10 @@ func (s *ParseTestSuite) TestParse() {
 		require.NotNil(msg)
 
 		if c.time.Year() != 0 {
-			ts := time.Unix(0, msg.Timestamp).In(c.time.Location())
+			ts := time.Unix(0, msg.Timestamp)
+			if !c.adjust {
+				ts = ts.In(c.time.Location())
+			}
 			require.Equal(c.time.Year(), ts.Year(), str)
 			require.Equal(c.time.Month(), ts.Month(), str)
 			require.Equal(c.time.Day(), ts.Day(), str)
