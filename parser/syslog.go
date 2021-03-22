@@ -232,7 +232,7 @@ func parseRFC5424(msg *Log, data []byte, length int) error {
 	i := 0
 	l := length
 
-	if !parsePriority(msg, data, &i, &l) || parseVersion(data, &i, &l) {
+	if !parsePriority(msg, data, &i, &l) || !parseVersion(data, &i, &l) {
 		return errParse
 	}
 
