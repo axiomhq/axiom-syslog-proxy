@@ -120,28 +120,28 @@ func (s *ParseTestSuite) TestParse() {
 
 	cases := []*Case{
 		/* RFC3164: priority, date, and time */
-		&Case{
+		{
 			raw:         []byte("<15> openvpn[2499]: PTHREAD support initialized"),
 			time:        now,
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 			imprecise:   true,
 		},
-		&Case{
+		{
 			raw:         []byte("<15> redis: \xef\xbb\xbfutf8isbom"),
 			time:        now,
 			application: "redis",
 			text:        "utf8isbom",
 			imprecise:   true,
 		},
-		&Case{
+		{
 			raw:         []byte("<15> openvpn[2499]: PTHREAD support initialized"),
 			time:        now,
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 			imprecise:   true,
 		},
-		&Case{
+		{
 			raw:         []byte(`<14> src time="2018-06-02T17:16:14.392415523+01:00" bool=false level=info float=5.6 number=3 msg="[graphdriver] using prior storage driver: aufs"`),
 			time:        now,
 			application: "src",
@@ -149,98 +149,98 @@ func (s *ParseTestSuite) TestParse() {
 			imprecise:   true,
 			metadata:    map[string]interface{}{"time": "2018-06-02T17:16:14.392415523+01:00", "bool": "false", "level": "info", "float": float64(5.6), "number": int64(3)},
 		},
-		&Case{
+		{
 			raw:         []byte("<15>Jan  1 01:00:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(now.Year(), 1, 1, 1, 0, 0, 0, time.Local),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<15>Jan 10 01:00:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(now.Year(), 1, 10, 1, 0, 0, 0, time.Local),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<13>Jan  1 14:40:51 alma korte: message"),
 			time:        time.Date(now.Year(), 1, 1, 14, 40, 51, 0, time.Local),
 			hostname:    "alma",
 			application: "korte",
 			text:        "message",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-11-10T10:43:21.156+02:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 11, 10, 8, 43, 21, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-11-10T10:43:21.156+01:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 11, 10, 9, 43, 21, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-03-26T01:59:59.156+01:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 03, 26, 0, 59, 59, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-03-26T02:00:00.156+01:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 03, 26, 1, 0, 0, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T01:00:00.156+02:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 28, 23, 0, 0, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T01:59:59.156+02:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 28, 23, 59, 59, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T02:00:00.156+02:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 29, 00, 00, 00, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T02:00:00.15+02:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 29, 00, 00, 00, 150000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T01:00:00.156+01:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 29, 00, 00, 00, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T01:59:59.156+01:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 29, 00, 59, 59, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T02:00:00.156+01:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 29, 1, 00, 00, 156000000, time.UTC),
 			hostname:    "bzorp",
@@ -248,97 +248,97 @@ func (s *ParseTestSuite) TestParse() {
 			text:        "PTHREAD support initialized",
 		},
 		// RFC3164: hostname
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T02:00:00.156+01:00 %bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 29, 1, 00, 00, 156000000, time.UTC),
 			hostname:    "%bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T02:00:00.156+01:00 bzorp openvpn[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 29, 1, 00, 00, 156000000, time.UTC),
 			hostname:    "bzorp",
 			application: "openvpn",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T02:00:00.156+01:00 "),
 			time:        time.Date(2006, 10, 29, 1, 00, 00, 156000000, time.UTC),
 			hostname:    "",
 			application: "",
 			text:        "",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T02:00:00.156+01:00"),
 			time:        time.Date(2006, 10, 29, 1, 00, 00, 156000000, time.UTC),
 			hostname:    "",
 			application: "",
 			text:        "",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>2006-10-29T02:00:00.156+01:00 ctld snmpd[2499]: PTHREAD support initialized"),
 			time:        time.Date(2006, 10, 29, 1, 00, 00, 156000000, time.UTC),
 			hostname:    "ctld",
 			application: "snmpd",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7> Aug 29 02:00:00.156 ctld snmpd[2499]: PTHREAD support initialized"),
 			time:        time.Date(now.Year(), 8, 29, 2, 00, 00, 156000000, time.Local),
 			hostname:    "ctld",
 			application: "snmpd",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7> Aug 29 02:00:00. ctld snmpd[2499]: PTHREAD support initialized"),
 			time:        time.Date(now.Year(), 8, 29, 2, 00, 00, 0, time.Local),
 			hostname:    "ctld",
 			application: "snmpd",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7> Aug 29 02:00:00 ctld snmpd[2499]: PTHREAD support initialized"),
 			time:        time.Date(now.Year(), 8, 29, 2, 00, 00, 0, time.Local),
 			hostname:    "ctld",
 			application: "snmpd",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<7>Aug 29 02:00:00 bzorp ctld/snmpd[2499]: PTHREAD support initialized"),
 			time:        time.Date(now.Year(), 8, 29, 2, 00, 00, 0, time.Local),
 			hostname:    "bzorp",
 			application: "ctld/snmpd",
 			text:        "PTHREAD support initialized",
 		},
-		&Case{
+		{
 			raw:         []byte("<190>Apr 15 2007 21:28:13: %PIX-6-302014: Teardown TCP connection 1688438 for bloomberg-net:1.2.3.4/8294 to inside:5.6.7.8/3639 duration 0:07:01 bytes 16975 TCP FINs"),
 			time:        time.Date(2007, 4, 15, 21, 28, 13, 0, time.Local),
 			hostname:    "",
 			application: "%PIX-6-302014",
 			text:        "Teardown TCP connection 1688438 for bloomberg-net:1.2.3.4/8294 to inside:5.6.7.8/3639 duration 0:07:01 bytes 16975 TCP FINs",
 		},
-		&Case{
+		{
 			raw:         []byte("<190>Apr 15 2007 21:28:13 %ASA: this is a Cisco ASA timestamp"),
 			time:        time.Date(2007, 4, 15, 21, 28, 13, 0, time.Local),
 			application: "%ASA",
 			text:        "this is a Cisco ASA timestamp",
 		},
-		&Case{
+		{
 			raw:         []byte("<38>Sep 22 10:11:56 cdaix66 sshd[679960]: Accepted publickey for nagios from 1.9.1.1 port 42096 ssh2"),
 			time:        time.Date(now.Year(), 9, 22, 10, 11, 56, 0, time.Local),
 			hostname:    "cdaix66",
 			application: "sshd",
 			text:        "Accepted publickey for nagios from 1.9.1.1 port 42096 ssh2",
 		},
-		&Case{
+		{
 			raw:         []byte("<38>Apr  8 10:03:21 XPS-13-9380 gnome-shell[2332]: Error invoking IBus.set_global_engine_async: Expected function for callback argument callback, got undefined#012setEngine@resource:///org/gnome/shell/misc/ibusManager.js:207:9#012wrapper@resource:///org/gnome/gjs/modules/_legacy.js:82:22"),
 			time:        time.Date(now.Year(), 4, 8, 10, 3, 21, 0, time.Local),
 			hostname:    "XPS-13-9380",
 			application: "gnome-shell",
 			text:        "Error invoking IBus.set_global_engine_async: Expected function for callback argument callback, got undefined\nsetEngine@resource:///org/gnome/shell/misc/ibusManager.js:207:9\nwrapper@resource:///org/gnome/gjs/modules/_legacy.js:82:22",
 		},
-		&Case{
+		{
 			raw:         []byte("Use the BFG!"),
 			time:        now,
 			application: "unknown",
@@ -347,7 +347,7 @@ func (s *ParseTestSuite) TestParse() {
 		},
 
 		// RFC5424
-		&Case{
+		{
 			raw:         []byte("<7>1 2006-10-29T01:59:59.156+01:00 mymachine.example.com evntslog - ID47 [exampleSDID@0 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@0 class=\"high\"] \xEF\xBB\xBF An application event log entry..."),
 			time:        time.Date(2006, 10, 29, 0, 59, 59, 156000000, time.UTC),
 			hostname:    "mymachine.example.com",
@@ -355,7 +355,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:        "An application event log entry...",
 			metadata:    map[string]interface{}{"exampleSDID.iut": "3", "examplePriority.class": "high", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "Application"},
 		},
-		&Case{
+		{
 			raw:         []byte("<6>1 2018-08-09T07:19:28.698693Z mymachine.example.com evntslog - ID47 - \xEF\xBB\xBFAn application event log entry..."),
 			time:        time.Date(2018, 8, 9, 7, 19, 28, 698693000, time.UTC),
 			hostname:    "mymachine.example.com",
@@ -363,7 +363,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:        "An application event log entry...",
 			metadata:    map[string]interface{}{},
 		},
-		&Case{
+		{
 			raw:         []byte("<7>1 2006-10-29T01:59:59.156Z mymachine.example.com evntslog - ID47 [exampleSDID@0 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@0 class=\"high\"] \xEF\xBB\xBF An application event log entry..."),
 			time:        time.Date(2006, 10, 29, 1, 59, 59, 156000000, time.UTC),
 			hostname:    "mymachine.example.com",
@@ -371,7 +371,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:        "An application event log entry...",
 			metadata:    map[string]interface{}{"exampleSDID.iut": "3", "examplePriority.class": "high", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "Application"},
 		},
-		&Case{
+		{
 			raw:         []byte("<7>1 2006-10-29T01:59:59.156Z mymachine.example.com evntslog - ID47 [ exampleSDID@0 iut=\"3\" eventSource=\"App\\\"lication\\]\" eventID=\"1011\"][examplePriority@0 class=\"high_class\"] \xEF\xBB\xBF An application event log entry..."),
 			time:        time.Date(2006, 10, 29, 1, 59, 59, 156000000, time.UTC),
 			hostname:    "mymachine.example.com",
@@ -379,7 +379,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:        "An application event log entry...",
 			metadata:    map[string]interface{}{"exampleSDID.iut": "3", "examplePriority.class": "high_class", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "App\"lication]"},
 		},
-		&Case{
+		{
 			raw:           []byte("<7>1 2006-10-29T01:59:59.156Z mymachine.example.com evntslog - ID47 - Running executor with --project=watchly .env=development"),
 			time:          time.Date(2006, 10, 29, 1, 59, 59, 156000000, time.UTC),
 			hostname:      "mymachine.example.com",
@@ -387,7 +387,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:          "Running executor with --project=watchly .env=development",
 			metadataLTLen: 1,
 		},
-		&Case{
+		{
 			raw:           []byte("<14>2018-06-19T11:08:00-07:00 bar elasticsearch: [2018-06-19 11:08:00,000][DEBUG][gateway] [Blizzard II] recovered [0] indices into cluster_state"),
 			time:          time.Date(2018, 6, 19, 18, 8, 00, 0, time.UTC),
 			hostname:      "bar",
@@ -395,7 +395,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:          "[2018-06-19 11:08:00,000][DEBUG][gateway] [Blizzard II] recovered [0] indices into cluster_state",
 			metadataLTLen: 0,
 		},
-		&Case{
+		{
 			raw:           []byte("<34>1 1987-01-01T12:00:27.156+00:20 192.0.2.1 myproc 8710 - - %% It's time to make the do-nuts.="),
 			time:          time.Date(1987, 1, 1, 11, 40, 27, 156000000, time.UTC),
 			hostname:      "192.0.2.1",
@@ -403,7 +403,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:          "%% It's time to make the do-nuts.=",
 			metadataLTLen: 0,
 		},
-		&Case{
+		{
 			raw:           []byte("<134>1 2009-10-16T11:51:56+02:00 exchange.macartney.esbjerg MSExchange_ADAccess 20208 - - = hello"),
 			time:          time.Date(2009, 10, 16, 9, 51, 56, 0, time.UTC),
 			hostname:      "exchange.macartney.esbjerg",
@@ -411,7 +411,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:          "= hello",
 			metadataLTLen: 1,
 		},
-		&Case{
+		{
 			raw:         []byte("<134>1 2009-10-16T11:51:56+02:00 2001:0db8:85a3:0000:0000:8a2e:0370:7334 MSExchange_ADAccess 20208 - - hello customer=njpatel@gmail.com source=web plan=\"professional plus\" foo= =bar hi"),
 			time:        time.Date(2009, 10, 16, 9, 51, 56, 0, time.UTC),
 			hostname:    "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -419,7 +419,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:        "hello customer=njpatel@gmail.com source=web plan=\"professional plus\" foo= =bar hi",
 			metadata:    map[string]interface{}{"customer": "njpatel@gmail.com", "source": "web", "plan": "professional plus"},
 		},
-		&Case{
+		{
 			raw:         []byte("<134>1 2009-10-16T11:51:56+02:00 www web - - - \"customer id\"=\"njpatel@gmail.com\" \"source_app\"=web plan=\"professional plus\" foo= =bar = \"region\"="),
 			time:        time.Date(2009, 10, 16, 9, 51, 56, 0, time.UTC),
 			hostname:    "www",
@@ -427,7 +427,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:        "\"customer id\"=\"njpatel@gmail.com\" \"source_app\"=web plan=\"professional plus\" foo= =bar = \"region\"=",
 			metadata:    map[string]interface{}{"customer id": "njpatel@gmail.com", "source_app": "web", "plan": "professional plus"},
 		},
-		&Case{
+		{
 			raw:         []byte("<134>1 2009-10-16T11:51:56+02:00 www web - - - customer=\"njpatel@gmail.com\" \"source_app\"=web plan=\"professional plus\" foo= =bar = =\"region\""),
 			time:        time.Date(2009, 10, 16, 9, 51, 56, 0, time.UTC),
 			hostname:    "www",
@@ -435,7 +435,7 @@ func (s *ParseTestSuite) TestParse() {
 			text:        "customer=\"njpatel@gmail.com\" \"source_app\"=web plan=\"professional plus\" foo= =bar = =\"region\"",
 			metadata:    map[string]interface{}{"customer": "njpatel@gmail.com", "source_app": "web", "plan": "professional plus"},
 		},
-		&Case{
+		{
 			raw:           []byte("<134>1 2009-10-16T11:51:56+02:00 www dash - - - GET 403 /api/v1/logs?groups=&last-log=2018-06-22T15%3A21%3A47.085654-07%3A00&delta=100 localhost:8080 ip=::1"),
 			time:          time.Date(2009, 10, 16, 9, 51, 56, 0, time.UTC),
 			hostname:      "www",
@@ -444,28 +444,28 @@ func (s *ParseTestSuite) TestParse() {
 			metadata:      map[string]interface{}{"ip": "::1"},
 			metadataLTLen: 2,
 		},
-		&Case{
+		{
 			raw:         []byte("<6>1 2018-06-04T16:43:18.874822+01:00 XPS-15-9560 kernel - - - device lo entered promiscuous mode"),
 			time:        time.Date(2018, 6, 4, 15, 43, 18, 874822000, time.UTC),
 			hostname:    "XPS-15-9560",
 			application: "kernel",
 			text:        "device lo entered promiscuous mode",
 		},
-		&Case{
+		{
 			raw:         []byte("<6>1 2018-06-04T16:43:18.874822+01:00 XPS-15-9560 org.gnome.Shell.desktop 2136 - - == Stack trace for context 0x563cea7c7340 =="),
 			time:        time.Date(2018, 6, 4, 15, 43, 18, 874822000, time.UTC),
 			hostname:    "XPS-15-9560",
 			application: "org.gnome.Shell.desktop",
 			text:        "== Stack trace for context 0x563cea7c7340 ==",
 		},
-		&Case{
+		{
 			raw:         []byte("<6>1 2018-08-09T07:19:28.698693Z myhost myapp - - - it is all fucked"),
 			time:        time.Date(2018, 8, 9, 07, 19, 28, 698693000, time.UTC),
 			hostname:    "myhost",
 			application: "myapp",
 			text:        "it is all fucked",
 		},
-		&Case{
+		{
 			raw:         []byte("<14>2018-06-19T11:08:00-07:00 bar elasticsearch: [2018-06-19 11:08:00,000][DEBUG][gateway] [Blizzard II] recovered [0] indices into cluster_state foo=bar"),
 			time:        time.Date(2018, 6, 19, 18, 8, 00, 0, time.UTC),
 			hostname:    "bar",
@@ -475,7 +475,7 @@ func (s *ParseTestSuite) TestParse() {
 				"foo": "bar",
 			},
 		},
-		&Case{
+		{
 			raw:         []byte(`<6> Mar  7 05:45:39 eth systemd[1]: Starting Message of the Day...`),
 			time:        time.Date(time.Now().Year(), 3, 7, 5, 45, 39, 0, time.UTC),
 			hostname:    "eth",
@@ -526,11 +526,11 @@ func (s *ParseTestSuite) TestRFC3164Dates() {
 		isUTC bool
 	}
 	fixtures := []syslogFixture{
-		syslogFixture{raw: []byte("<34>Oct 1 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
-		syslogFixture{raw: []byte("<34>Oct  1 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
-		syslogFixture{raw: []byte("<34>Oct 01 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
-		syslogFixture{raw: []byte(fmt.Sprintf("<34>%d-10-01T22:14:15Z mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8", time.Now().Year())), isUTC: true},
-		syslogFixture{raw: []byte(fmt.Sprintf("<34>%d-10-01T22:14:15+00:00 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8", time.Now().Year())), isUTC: true},
+		{raw: []byte("<34>Oct 1 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
+		{raw: []byte("<34>Oct  1 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
+		{raw: []byte("<34>Oct 01 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
+		{raw: []byte(fmt.Sprintf("<34>%d-10-01T22:14:15Z mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8", time.Now().Year())), isUTC: true},
+		{raw: []byte(fmt.Sprintf("<34>%d-10-01T22:14:15+00:00 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8", time.Now().Year())), isUTC: true},
 	}
 
 	for _, f := range fixtures {

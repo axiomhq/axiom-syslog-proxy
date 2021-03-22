@@ -1,0 +1,112 @@
+project_name: axiom-syslog-proxy
+
+builds:
+  - <<: &build_defaults
+      binary: axiom-syslog-proxy
+      main: ./cmd/axiom-syslog-proxy
+      env:
+        - CGO_ENABLED=0
+      flags:
+        - -buildmode=pie
+        - -installsuffix=cgo
+        - -trimpath
+        - -tags="osusergo netgo static_build"
+      ldflags:
+        - -s -w -extldflags "-fno-PIC -static -Wl -z now -z relro"
+        - -X github.com/axiomhq/pkg/version.release={{ .Version }}
+        - -X github.com/axiomhq/pkg/version.revision={{ .ShortCommit }}
+        - -X github.com/axiomhq/pkg/version.buildDate={{ .CommitDate }}
+        - -X github.com/axiomhq/pkg/version.buildUser=goreleaser
+      mod_timestamp: "{{ .CommitTimestamp }}"
+    id: darwin
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+  - <<: *build_defaults
+    id: linux
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    
+  - <<: *build_defaults
+    flags:
+      - -buildmode=exe
+    id: linux-no-pie
+    goos:
+      - linux
+    goarch:
+      - 386
+      - arm
+    goarm:
+      - 6
+      - 7
+
+  - <<: *build_defaults
+    id: windows
+    goos:
+      - windows
+    goarch:
+      - 386
+      - amd64
+
+archives:
+  - <<: &archive_defaults
+      name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    id: nix
+    builds:
+      - darwin
+      - linux
+      - linux-no-pie
+    wrap_in_directory: true
+    format: tar.gz
+    files:
+      - LICENSE
+      - README.md
+  - <<: *archive_defaults
+    id: windows
+    builds:
+      - windows
+    wrap_in_directory: false
+    format: zip
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+milestones:
+  - repo:
+      owner: axiomhq
+      name: axiom-syslog-proxy
+    close: true
+    fail_on_error: false
+
+release:
+  github:
+    owner: axiomhq
+    name: axiom-syslog-proxy
+  prerelease: auto
+  name_template: "Axiom Syslog Proxy v{{ .Version }}"
+
+dockers:
+  - image_templates:
+      - "axiomhq/axiom-syslog-proxy:{{ .Major }}"
+      - "axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}"
+      - "axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "axiomhq/axiom-syslog-proxy:latest"
