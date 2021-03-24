@@ -104,9 +104,25 @@ release:
   prerelease: auto
   name_template: "Axiom Syslog Proxy v{{ .Version }}"
 
+brews:
+  - name: axiom-syslog-proxy
+    description: Syslog ingestion by proxy for Axiom
+    homepage: https://axiom.co
+    license: MIT
+    tap:
+      owner: axiomhq
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TOKEN }}"
+    commit_author:
+      name: axiom-automation
+      email: hello@axiom.co
+    skip_upload: auto
+    folder: Formula
+    install: bin.install "{{ .ProjectName }}"
+
 dockers:
   - image_templates:
-      - "axiomhq/axiom-syslog-proxy:{{ .Major }}"
-      - "axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}"
-      - "axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-      - "axiomhq/axiom-syslog-proxy:latest"
+    - "axiomhq/axiom-syslog-proxy:{{ .Major }}"
+    - "axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}"
+    - "axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+    - "axiomhq/axiom-syslog-proxy:latest"

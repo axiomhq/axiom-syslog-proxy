@@ -28,6 +28,26 @@ Binary releases are available on [GitHub Releases][2].
 
   [2]: https://github.com/axiomhq/axiom-syslog-proxy/releases/latest
 
+### Install using [Homebrew](https://brew.sh)
+
+```shell
+$ brew tap axiomhq/tap
+$ brew install axiom-syslog-proxy
+```
+
+To update:
+
+```shell
+$ brew update
+$ brew upgrade axiom-syslog-proxy
+```
+
+### Install using `go get`
+
+```shell
+$ go get -u github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-proxy
+```
+
 ### Install from source
 
 ```shell
