@@ -83,7 +83,7 @@ $ docker run -p601:601/tcp -p514:514/udp  \
 3. Test it:
 
 ```shell
-$ echo -n "tcp message" | nc -u -w1 localhost 601
+$ echo -n "tcp message" | nc -w1 localhost 601
 $ echo -n "udp message" | nc -u -w1 localhost 514
 ```
 
