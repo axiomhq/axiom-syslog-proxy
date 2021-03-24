@@ -128,6 +128,7 @@ brews:
     skip_upload: auto
     folder: Formula
     install: bin.install "{{ .ProjectName }}"
+    test: assert_match "x", "x"
 
 dockers:
   - ids:
