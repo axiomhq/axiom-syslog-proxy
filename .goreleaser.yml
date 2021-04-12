@@ -36,6 +36,9 @@ builds:
   - <<: *build_defaults
     flags:
       - -buildmode=exe
+      - -installsuffix=cgo
+      - -trimpath
+      - -tags="osusergo netgo static_build"
     id: linux-no-pie
     goos:
       - linux
@@ -49,6 +52,9 @@ builds:
   - <<: *build_defaults
     flags:
       - -buildmode=exe
+      - -installsuffix=cgo
+      - -trimpath
+      - -tags="osusergo netgo static_build"
     id: docker
     goos:
       - linux
