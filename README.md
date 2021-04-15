@@ -53,7 +53,7 @@ $ go get -u github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-proxy
 ```shell
 $ git clone https://github.com/axiomhq/axiom-syslog-proxy.git
 $ cd axiom-syslog-proxy
-$ make build
+$ make install
 ```
 
 ### Run the Docker image
