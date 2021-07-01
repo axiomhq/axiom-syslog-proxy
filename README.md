@@ -31,8 +31,8 @@ Binary releases are available on [GitHub Releases][2].
 ### Install using [Homebrew](https://brew.sh)
 
 ```shell
-$ brew tap axiomhq/tap
-$ brew install axiom-syslog-proxy
+ brew tap axiomhq/tap
+ brew install axiom-syslog-proxy
 ```
 
 To update:
