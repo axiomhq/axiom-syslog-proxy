@@ -45,7 +45,7 @@ To update:
 ### Install using `go get`
 
 ```shell
-$ go get -u github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-proxy
+ go get -u github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-proxy
 ```
 
 ### Install from source
