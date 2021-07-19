@@ -106,8 +106,8 @@ See [LICENSE](LICENSE) for more information.
 
 <!-- Badges -->
 
-[go_workflow]: https://github.com/axiomhq/axiom-syslog-proxy/actions?query=workflow%3Ago
-[go_workflow_badge]: https://img.shields.io/github/workflow/status/axiomhq/axiom-syslog-proxy/go?style=flat-square&ghcache=unused
+[go_workflow]: https://github.com/axiomhq/axiom-syslog-proxy/actions/workflows/push.yml
+[go_workflow_badge]: https://img.shields.io/github/workflow/status/axiomhq/axiom-syslog-proxy/push?style=flat-square&ghcache=unused
 [coverage]: https://codecov.io/gh/axiomhq/axiom-syslog-proxy
 [coverage_badge]: https://img.shields.io/codecov/c/github/axiomhq/axiom-syslog-proxy.svg?style=flat-square&ghcache=unused
 [report]: https://goreportcard.com/report/github.com/axiomhq/axiom-syslog-proxy
