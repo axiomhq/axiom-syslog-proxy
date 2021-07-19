@@ -15,12 +15,10 @@ linters:
     - dogsled
     - dupl
     - errcheck
-    # - exhaustive
     - exportloopref
     - goconst
     - gofmt
     - goimports
-    - golint
     - gosec
     - gosimple
     - govet
@@ -28,6 +26,7 @@ linters:
     - misspell
     - nolintlint
     - prealloc
+    - revive
     - staticcheck
     - structcheck
     - stylecheck

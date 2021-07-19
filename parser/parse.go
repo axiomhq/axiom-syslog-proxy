@@ -88,10 +88,7 @@ func parseJSON(data []byte) (*Log, error) {
 	}
 
 	if err := jsonparser.ObjectEach(data, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
-		if err := extractJSONProperty(key, value, dataType, msg); err != nil {
-			return err
-		}
-		return nil
+		return extractJSONProperty(key, value, dataType, msg)
 	}); err != nil {
 		return nil, err
 	}
@@ -142,10 +139,7 @@ func extractMetadataValue(concatKey string, value []byte, dataType jsonparser.Va
 	case jsonparser.Object:
 		level++
 		if err := jsonparser.ObjectEach(value, func(kk []byte, vv []byte, dtdt jsonparser.ValueType, offset int) error {
-			if err := extractMetadataValue(joinKey(concatKey, string(kk)), vv, dtdt, level, msg); err != nil {
-				return err
-			}
-			return nil
+			return extractMetadataValue(joinKey(concatKey, string(kk)), vv, dtdt, level, msg)
 		}); err != nil {
 			return err
 		}

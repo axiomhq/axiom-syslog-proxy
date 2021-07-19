@@ -31,29 +31,29 @@ Binary releases are available on [GitHub Releases][2].
 ### Install using [Homebrew](https://brew.sh)
 
 ```shell
- brew tap axiomhq/tap
- brew install axiom-syslog-proxy
+brew tap axiomhq/tap
+brew install axiom-syslog-proxy
 ```
 
 To update:
 
 ```shell
- brew update
- brew upgrade axiom-syslog-proxy
+brew update
+brew upgrade axiom-syslog-proxy
 ```
 
 ### Install using `go get`
 
 ```shell
- go get -u github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-proxy
+go get -u github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-proxy
 ```
 
 ### Install from source
 
 ```shell
- git clone https://github.com/axiomhq/axiom-syslog-proxy.git
- cd axiom-syslog-proxy
- make install
+git clone https://github.com/axiomhq/axiom-syslog-proxy.git
+cd axiom-syslog-proxy
+make install
 ```
 
 ### Run the Docker image
@@ -73,7 +73,7 @@ Docker images are available on [DockerHub][docker].
 2. Run it: `./axiom-syslog-proxy` or using docker:
 
 ```shell
- docker run -p601:601/tcp -p514:514/udp  \
+docker run -p601:601/tcp -p514:514/udp  \
   -e=AXIOM_DEPLOYMENT_URL=<AXIOM_DEPLOYMENT_URL> \
   -e=AXIOM_ACCESS_TOKEN=<AXIOM_ACCESS_TOKEN> \
   -e=AXIOM_INGEST_DATASET=<AXIOM_INGEST_DATASET> \
@@ -83,8 +83,8 @@ Docker images are available on [DockerHub][docker].
 3. Test it:
 
 ```shell
- echo -n "tcp message" | nc -w1 localhost 601
- echo -n "udp message" | nc -u -w1 localhost 514
+echo -n "tcp message" | nc -w1 localhost 601
+echo -n "udp message" | nc -u -w1 localhost 514
 ```
 
 ## Contributing
