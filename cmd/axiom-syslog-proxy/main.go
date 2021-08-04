@@ -5,15 +5,16 @@ import (
 	"log"
 	"os"
 
+	"github.com/axiomhq/axiom-go/axiom"
 	"github.com/axiomhq/pkg/version"
 
 	"github.com/axiomhq/axiom-syslog-proxy/server"
 )
 
 var (
-	deploymentURL = os.Getenv("AXIOM_DEPLOYMENT_URL")
-	ingestToken   = os.Getenv("AXIOM_ACCESS_TOKEN")
-	ingestDataset = os.Getenv("AXIOM_INGEST_DATASET")
+	deploymentURL = os.Getenv("AXIOM_URL")
+	ingestToken   = os.Getenv("AXIOM_TOKEN")
+	ingestDataset = os.Getenv("AXIOM_DATASET")
 
 	addrTCP = flag.String("addr-tcp", ":601", "Listen address <ip>:<port>")
 	addrUDP = flag.String("addr-udp", ":514", "Listen address <ip>:<port>")
@@ -25,13 +26,13 @@ func main() {
 	flag.Parse()
 
 	if deploymentURL == "" {
-		log.Fatal("missing AXIOM_DEPLOYMENT_URL")
+		deploymentURL = axiom.CloudURL
 	}
 	if ingestToken == "" {
-		log.Fatal("missing AXIOM_ACCESS_TOKEN")
+		log.Fatal("missing AXIOM_TOKEN")
 	}
 	if ingestDataset == "" {
-		log.Fatal("missing AXIOM_INGEST_DATASET")
+		log.Fatal("missing AXIOM_DATASET")
 	}
 
 	config := &server.Config{

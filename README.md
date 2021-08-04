@@ -64,19 +64,21 @@ Docker images are available on [DockerHub][docker].
 
 1. Set the following environment variables:
 
-* `AXIOM_DEPLOYMENT_URL`: URL of the Axiom deployment to use
-* `AXIOM_ACCESS_TOKEN`: **Personal Access** or **Ingest** token. Can be
+* `AXIOM_TOKEN`: **Personal Access** or **Ingest** token. Can be
   created under `Profile` or `Settings > Ingest Tokens`. For security reasons
   it is advised to use an Ingest Token with minimal privileges only.
-* `AXIOM_INGEST_DATASET`: Dataset to ingest into
+* `AXIOM_DATASET`: Dataset to ingest into.
 
-2. Run it: `./axiom-syslog-proxy` or using docker:
+When using Axiom Selfhost:
+
+* `AXIOM_URL`: URL of the Axiom deployment to use.
+
+2. Run it: `./axiom-syslog-proxy` or using Docker:
 
 ```shell
 docker run -p601:601/tcp -p514:514/udp  \
-  -e=AXIOM_DEPLOYMENT_URL=<AXIOM_DEPLOYMENT_URL> \
-  -e=AXIOM_ACCESS_TOKEN=<AXIOM_ACCESS_TOKEN> \
-  -e=AXIOM_INGEST_DATASET=<AXIOM_INGEST_DATASET> \
+  -e=AXIOM_TOKEN=<YOUR_AXIOM_TOKEN>     \
+  -e=AXIOM_DATASET=<YOUR_AXIOM_DATASET> \
   axiomhq/axiom-syslog-proxy
 ```
 
