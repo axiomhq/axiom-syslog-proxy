@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -84,12 +85,33 @@ func (s *ParseTestSuite) TestParseJson() {
 			severity:    int64(Trace),
 			metadata:    map[string]interface{}{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
 		},
+		// JSON encoded in syslog
+		{
+			raw:         []byte(fmt.Sprintf(`<14> overrideme: {"level":"trace", "msg": "Best recent 3", "bool": true, "forwind": {"favourites":  {"artist" : "Rune Clausen", "album": "Blindlight", "release" : { "duration" : 100, "catno" : "fwd09", "link" : { "url" : "http://www.forwind.net", "type" : {"origin": "home", "ignore": {"this": "we shouldn't parse this"}}}}}}, "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted)),
+			time:        now,
+			application: "logstash",
+			hostname:    "forwind.net",
+			text:        "Best recent 3",
+			severity:    int64(Trace),
+			metadata:    map[string]interface{}{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
+		},
+		// JSON encoded in non valid syslog
+		{
+			raw:         []byte(fmt.Sprintf(`<14> overrideme: {"level":"trace", "msg": "Best recent 3", "bool": true, "forwind": {"favourites":  {"artist" : "Rune Clausen", "album": "Blindlight", "release" : { "duration" : 100, "catno" : "fwd09", "link" : { "url" : "http://www.forwind.net", "type" : {"origin": "home", "ignore": {"this": "we shouldn't parse this"}}}}}}, "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted)),
+			time:        now,
+			application: "logstash",
+			hostname:    "forwind.net",
+			text:        "Best recent 3",
+			severity:    int64(Trace),
+			metadata:    map[string]interface{}{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
+		},
 	}
 
 	for number, c := range cases {
+		str := fmt.Sprintf("index=%d, raw:\n%s", number, string(c.raw))
+
 		msg := ParseLineWithFallback(c.raw, "forwind.net")
-		str := fmt.Sprintf("%d  %s", number, string(c.raw))
-		require.NotNil(msg)
+		require.NotNil(msg, str)
 
 		if c.hostname != "" {
 			require.Equal(c.hostname, msg.Hostname, str)
@@ -540,7 +562,7 @@ func (s *ParseTestSuite) TestRFC3164Dates() {
 
 	for _, f := range fixtures {
 		str := string(f.raw)
-		msg, _ := parseLine(f.raw)
+		msg, _ := parseSyslogLine(f.raw)
 		assert.NotNil(msg)
 		assert.Equal(int64(2), msg.Severity, str)
 		loc := time.Local
@@ -560,7 +582,7 @@ func (s *ParseTestSuite) TestRFC3164SequenceID() {
 
 	buff := []byte("<34>214: Oct 11 22:14:15 mymachine very.large.syslog.message.tag: 'su root' failed for lonvick on /dev/pts/8")
 
-	msg, _ := parseLine(buff)
+	msg, _ := parseSyslogLine(buff)
 	assert.NotNil(msg)
 	assert.Equal("214", msg.Metadata["SequenceID"])
 	assert.Equal(time.Date(time.Now().Year(), time.October, 11, 22, 14, 15, 0, time.Local), time.Unix(0, msg.Timestamp))
@@ -572,7 +594,7 @@ func (s *ParseTestSuite) TestRFC3164NoTimeOrHost() {
 
 	buff := []byte("<34>214: myprogram[332] 'su root' failed for lonvick on /dev/pts/8")
 
-	msg, _ := parseLine(buff)
+	msg, _ := parseSyslogLine(buff)
 	assert.NotNil(msg)
 	assert.Equal("214", msg.Metadata["SequenceID"])
 	assert.Equal(time.Now().UTC().Day(), time.Unix(0, msg.Timestamp).UTC().Day())
@@ -605,7 +627,7 @@ func (s *ParseTestSuite) TestFuzzCrashers() {
 	}
 
 	for _, data := range payloads {
-		_, err := parseLine(data)
+		_, err := parseSyslogLine(data)
 		s.Error(err)
 	}
 }
@@ -615,7 +637,7 @@ func (s *ParseTestSuite) TestUnescape() {
 
 	buff := []byte("<34>214: myprogram[332]: #033[32mdebug#033[0m #033[37;2mdatastores#033[0m@#033[94mdatastores.statsd#033[0m accumulator.go:149 Encountered err #033")
 
-	msg, _ := parseLine(buff)
+	msg, _ := parseSyslogLine(buff)
 	assert.NotNil(msg)
 	assert.Equal("\x1b[32mdebug\x1b[0m \x1b[37;2mdatastores\x1b[0m@\x1b[94mdatastores.statsd\x1b[0m accumulator.go:149 Encountered err #033", msg.Text)
 }
@@ -654,7 +676,7 @@ func (s *ParseTestSuite) TestExtractSeverity() {
 func Benchmark5424(b *testing.B) {
 	raw := []byte("<134>1 2009-10-16T11:51:56+02:00 ip-34-23-211-23 symbolicator 2008 SOMEMSG - hello")
 	for i := 0; i < b.N; i++ {
-		msg, _ := parseLine(raw)
+		msg, _ := parseSyslogLine(raw)
 		if msg == nil {
 			panic(errors.New("Unable to parse message"))
 		}
@@ -664,7 +686,7 @@ func Benchmark5424(b *testing.B) {
 func BenchmarkParserDifferentMetadataTypes(b *testing.B) {
 	raw := []byte(`<14> src time="2018-06-02T17:16:14.392415523+01:00" bool=false level=info float=5.6 number=3 msg="[graphdriver] using prior storage driver: aufs"`)
 	for i := 0; i < b.N; i++ {
-		msg, _ := parseLine(raw)
+		msg, _ := parseSyslogLine(raw)
 		if msg == nil {
 			panic(errors.New("Unable to parse message"))
 		}
@@ -689,7 +711,7 @@ func BenchmarkParser(b *testing.B) {
 func BenchmarkDateParse(b *testing.B) {
 	raw := []byte("<13>Jan  1 14:40:51 host app[24]: this is the message")
 	for i := 0; i < b.N; i++ {
-		msg, _ := parseLine(raw)
+		msg, _ := parseSyslogLine(raw)
 		if msg == nil {
 			panic(errors.New("Unable to parse message"))
 		}
@@ -699,9 +721,107 @@ func BenchmarkDateParse(b *testing.B) {
 func BenchmarkNoDateParse(b *testing.B) {
 	raw := []byte("<13>host app[24]: this is the message")
 	for i := 0; i < b.N; i++ {
-		msg, _ := parseLine(raw)
+		msg, _ := parseSyslogLine(raw)
 		if msg == nil {
 			panic(errors.New("Unable to parse message"))
 		}
+	}
+}
+
+func Benchmark_detectMaybeJSON(b *testing.B) {
+	tests := map[string][]byte{
+		"justjson":     []byte(`{"foo":"bar"}`),
+		"padded":       []byte(`                            {"foo":"bar"}                              `),
+		"withpre":      []byte(`<12> {"foo":"bar"}`),
+		"justsyslog":   []byte(`<14>Jan  1 14:40:51 host app[24]: this is the message`),
+		"jsoninsyslog": []byte(`<12>Jan  1 14:40:51 host app[24]: {"foo": "{"}`),
+	}
+
+	for name, test := range tests {
+		b.Run(name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				detectMaybeJSON(test)
+			}
+		})
+	}
+}
+
+func Test_detectMaybeJSON(t *testing.T) {
+	type args struct {
+		line []byte
+	}
+	tests := []struct {
+		name       string
+		line       []byte
+		wantOk     bool
+		wantResult []byte
+	}{
+		{
+			name:       "nojson",
+			line:       []byte("<14>Jan  1 14:40:51 host app[24]: this is the message"),
+			wantOk:     false,
+			wantResult: nil,
+		},
+		{
+			name:       "justjson",
+			line:       []byte(`{"foo": "bar"}`),
+			wantOk:     true,
+			wantResult: []byte(`{"foo": "bar"}`),
+		},
+		{
+			name:       "justjson-rightpadded",
+			line:       []byte(`{"foo": "bar"}                            `),
+			wantOk:     true,
+			wantResult: []byte(`{"foo": "bar"}`),
+		},
+		{
+			name:       "justjson-leftpadded",
+			line:       []byte(`                            {"foo": "bar"}`),
+			wantOk:     true,
+			wantResult: []byte(`{"foo": "bar"}`),
+		},
+		{
+			name:       "justjson-padded",
+			line:       []byte(`                            {"foo": "bar"}                         `),
+			wantOk:     true,
+			wantResult: []byte(`{"foo": "bar"}`),
+		},
+		{
+			name:       "recursivejson",
+			line:       []byte(`{"foo": {"foo": "bar"}}`),
+			wantOk:     true,
+			wantResult: []byte(`{"foo": {"foo": "bar"}}`),
+		},
+		{
+			name:       "jsonwithcurlybraces",
+			line:       []byte(`{"foo": "{"}`),
+			wantOk:     true,
+			wantResult: []byte(`{"foo": "{"}`),
+		},
+		// as a special case detect here as RFC5424 will parse this as a syslog line
+		// with the appName/Hostname set to `{"foo"` and the MSG ` "{"}`
+		{
+			name:       "jsonwithsyslogpre",
+			line:       []byte(`<12> {"foo": "{"}`),
+			wantOk:     true,
+			wantResult: []byte(`{"foo": "{"}`),
+		},
+		{ // expected to not detect as we expect this to now be a part of the MSG after parsing
+			name:       "jsonwithvalidsyslog",
+			line:       []byte(`<14>Jan  1 14:40:51 host app[24]: {"foo": "{"}`),
+			wantOk:     false,
+			wantResult: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotOk, gotResult := detectMaybeJSON(tt.line)
+			if gotOk != tt.wantOk {
+				t.Errorf("detectMaybeJSON() gotOk = %v, want %v", gotOk, tt.wantOk)
+			}
+			if !reflect.DeepEqual(gotResult, tt.wantResult) {
+				t.Errorf("detectMaybeJSON() gotResult = %v, want %v", string(gotResult), string(tt.wantResult))
+			}
+		})
 	}
 }

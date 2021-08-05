@@ -27,25 +27,32 @@ var (
 // ParseLineWithFallback parses an individual line, and creates a message if the line is not valid
 func ParseLineWithFallback(line []byte, remoteAddr string) *Log {
 	var m *Log
-	var parseErr error
+	var err error
 
-	if detectJSON(line) {
-		m, parseErr = parseJSON(line)
+	if ok, jsonMsg := detectMaybeJSON(line); ok {
+		m, err = parseJSON(jsonMsg)
+		// if the message is not valid json, fallback to syslog
+		if err != nil {
+			if logger.IsDebugEnabled() {
+				logger.Debug("Unable to parse log line, err=%q: %s", err, string(line))
+			}
+			m, err = parseSyslogLine(line)
+		}
 	} else {
-		m, parseErr = parseLine(line)
+		m, err = parseSyslogLine(line)
 	}
 
-	if parseErr != nil {
+	if err != nil {
 		if logger.IsDebugEnabled() {
 			logger.Debug("Unable to parse log line: %s", string(line))
 		}
-		if parseErr == errCorruptedData {
+		if err == errCorruptedData {
 			return nil
 		}
 		if len(line) < 1 {
 			return nil
 		}
-		if m, parseErr = syntheticLog(remoteAddr, line); parseErr != nil {
+		if m, err = syntheticLog(remoteAddr, line); err != nil {
 			return nil
 		}
 	}
@@ -62,23 +69,78 @@ func ParseLineWithFallback(line []byte, remoteAddr string) *Log {
 
 	parseApp(m)
 
+	// attempt to parse json from the text property
+	if ok, msg := detectMaybeJSON([]byte(m.Text)); ok {
+		sublog, err := parseJSON(msg)
+		if err == nil {
+			// merge the sublog with the main log
+			m.Merge(sublog)
+		}
+	}
+
 	// Always last
 	populateSeverity(m)
 
 	return m
 }
 
-func detectJSON(line []byte) bool {
-	for _, c := range line {
-		if c == ' ' {
+// detectMaybeJSON finds hints of a json message but does not
+// guarantee that the message is actually json parsable.
+func detectMaybeJSON(line []byte) (ok bool, result []byte) {
+	if len(line) < 1 {
+		return
+	}
+
+	// search backwards for } as json messages are always going to end
+	// with }
+	var farIndex int
+	for i := len(line) - 1; i >= 0; i-- {
+		// Note: not unicode safe, but will always fail if unicode characters are present
+		switch line[i] {
+		case ' ':
 			continue
-		} else if c == '{' {
-			return true
-		} else {
-			return false
+		case '}':
+			farIndex = i
+			break
+		default:
+			return
+		}
+		break
+	}
+
+	// sanity check
+	if farIndex < 1 {
+		return
+	}
+
+	// look for either a syslog PRE (https://datatracker.ietf.org/doc/html/rfc5424#section-6)
+	// or a json message
+	// we only support looking for a PRE as a special case to avoid RFC5424 parsing
+	// json fields as appName/Hostname
+	for i := 0; i < len(line); i++ {
+		// Note: not unicode safe, but syslog does not allow unicode characters
+		// so will fail before unicode becomes an issue
+		switch line[i] {
+		case ' ':
+			continue
+		case '<':
+			// PRE start, zoom forward to the end
+			for ; i < len(line); i++ {
+				switch line[i] {
+				case '>':
+					break
+				default:
+					continue
+				}
+				break
+			}
+		case '{':
+			return true, line[i : farIndex+1]
+		default:
+			return
 		}
 	}
-	return false
+	return
 }
 
 // parseJSON takes a single json message to parse
@@ -188,8 +250,8 @@ func joinKey(parent string, child string) string {
 	return fmt.Sprintf("%s.%s", parent, child)
 }
 
-// parseLine takes a single syslog message to parse
-func parseLine(data []byte) (*Log, error) {
+// parseSyslogLine takes a single syslog message to parse
+func parseSyslogLine(data []byte) (*Log, error) {
 	if bytes.IndexByte(data, '<') != 0 {
 		return nil, errParse
 	}
@@ -198,7 +260,7 @@ func parseLine(data []byte) (*Log, error) {
 
 func syntheticLog(host string, msg []byte) (*Log, error) {
 	line := fmt.Sprintf("<14>%s %s %s: %s", time.Now().UTC().Format(time.RFC3339), host, "unknown", bytes.TrimSpace(msg))
-	return parseLine([]byte(line))
+	return parseSyslogLine([]byte(line))
 }
 
 func extractSeverity(text string) int32 {

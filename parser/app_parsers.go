@@ -11,7 +11,7 @@ func parseApp(msg *Log) {
 
 // systemd and auth don't come in with the header so we need to add it to parse them
 func parseSystemd(msg *Log) {
-	if m, _ := parseLine([]byte("<6> " + msg.Text)); m != nil {
+	if m, _ := parseSyslogLine([]byte("<6> " + msg.Text)); m != nil {
 		msg.Application = m.Application
 		msg.Text = m.Text
 
