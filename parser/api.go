@@ -96,6 +96,30 @@ type Log struct {
 	Metadata    map[string]interface{}
 }
 
+func (l *Log) Merge(other *Log) {
+	if other.Timestamp != 0 && other.Timestamp != l.Timestamp {
+		l.Timestamp = other.Timestamp
+	}
+	if other.Severity != 0 && other.Severity != l.Severity {
+		l.Severity = other.Severity
+	}
+	if other.RemoteAddr != "" {
+		l.RemoteAddr = other.RemoteAddr
+	}
+	if other.Hostname != "" {
+		l.Hostname = other.Hostname
+	}
+	if other.Application != "" {
+		l.Application = other.Application
+	}
+	if other.Text != "" {
+		l.Text = other.Text
+	}
+	for k, v := range other.Metadata {
+		l.Metadata[k] = v
+	}
+}
+
 // PrettyPrint ...
 func (l *Log) PrettyPrint() {
 	var metadata []string
