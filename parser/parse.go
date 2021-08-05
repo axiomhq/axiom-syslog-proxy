@@ -101,7 +101,6 @@ func detectMaybeJSON(line []byte) (ok bool, result []byte) {
 			continue
 		case '}':
 			farIndex = i
-			break
 		default:
 			return
 		}

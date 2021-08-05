@@ -747,9 +747,6 @@ func Benchmark_detectMaybeJSON(b *testing.B) {
 }
 
 func Test_detectMaybeJSON(t *testing.T) {
-	type args struct {
-		line []byte
-	}
 	tests := []struct {
 		name       string
 		line       []byte
