@@ -59,7 +59,7 @@ func NewServer(config *Config) (*Server, error) {
 }
 
 func (srv *Server) onLogMessage(log *parser.Log) {
-	ev := logToEvent(log)
+	ev := LogToEvent(log)
 	srv.mu.Lock()
 	srv.queue = append(srv.queue, ev)
 	needsFlushing := len(srv.queue) >= maxQueueSize
@@ -70,7 +70,7 @@ func (srv *Server) onLogMessage(log *parser.Log) {
 	}
 }
 
-func logToEvent(log *parser.Log) axiom.Event {
+func LogToEvent(log *parser.Log) axiom.Event {
 	ev := axiom.Event{}
 
 	ev[axiom.TimestampField] = log.Timestamp
