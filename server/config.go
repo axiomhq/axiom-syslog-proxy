@@ -11,9 +11,7 @@ const (
 
 // Config ...
 type Config struct {
-	URL     string
 	Dataset string
-	Token   string
 	AddrUDP string
 	AddrTCP string
 }

@@ -31,13 +31,8 @@ type Server struct {
 	mu    sync.RWMutex
 }
 
-func NewServer(config *Config) (*Server, error) {
-	client, err := axiom.NewClient(config.URL, config.Token)
-	if err != nil {
-		return nil, err
-	}
-
-	srv := &Server{
+func NewServer(client *axiom.Client, config *Config) (srv *Server, err error) {
+	srv = &Server{
 		config: config,
 		client: client,
 		queue:  make([]axiom.Event, 0, maxQueueSize),
