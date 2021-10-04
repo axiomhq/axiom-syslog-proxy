@@ -3,21 +3,13 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/axiomhq/axiom-go/axiom"
-	"github.com/axiomhq/pkg/version"
+	"github.com/axiomhq/pkg/cmd"
+	"go.uber.org/zap"
 
 	"github.com/axiomhq/axiom-syslog-proxy/server"
-)
-
-const (
-	exitOK int = iota
-	exitConfig
-	exitInternal
 )
 
 var (
@@ -26,54 +18,30 @@ var (
 )
 
 func main() {
-	os.Exit(Main())
+	cmd.Run("axiom-syslog-proxy", run,
+		cmd.WithRequiredEnvVars("AXIOM_DATASET"),
+		cmd.WithValidateAxiomCredentials(),
+	)
 }
 
-func Main() int {
-	// Export `AXIOM_TOKEN` and `AXIOM_ORG_ID` for Axiom Cloud
-	// Export `AXIOM_URL` and `AXIOM_TOKEN` for Axiom Selfhost
-
-	log.Print("starting axiom-syslog-proxy version ", version.Release())
+func run(ctx context.Context, log *zap.Logger, client *axiom.Client) error {
+	// Export `AXIOM_TOKEN`, `AXIOM_ORG_ID` and `AXIOM_DATASET` for Axiom Cloud.
+	// Export `AXIOM_URL`, `AXIOM_TOKEN` and `AXIOM_DATASET` for Axiom Selfhost.
 
 	flag.Parse()
 
-	ctx, cancel := signal.NotifyContext(context.Background(),
-		os.Interrupt,
-		os.Kill,
-		syscall.SIGHUP,
-		syscall.SIGINT,
-		syscall.SIGQUIT,
-	)
-	defer cancel()
-
-	dataset := os.Getenv("AXIOM_DATASET")
-	if dataset == "" {
-		log.Print("AXIOM_DATASET is required")
-		return exitConfig
-	}
-
-	client, err := axiom.NewClient()
-	if err != nil {
-		log.Print(err)
-		return exitConfig
-	} else if err = client.ValidateCredentials(ctx); err != nil {
-		log.Print(err)
-		return exitConfig
-	}
-
 	config := &server.Config{
-		Dataset: dataset,
+		Dataset: os.Getenv("AXIOM_DATASET"),
 		AddrUDP: *addrUDP,
 		AddrTCP: *addrTCP,
 	}
 
 	srv, err := server.NewServer(client, config)
 	if err != nil {
-		log.Print(err)
-		return exitInternal
+		return cmd.Error("create server", err)
 	}
 
 	srv.Run()
 
-	return exitOK
+	return nil
 }
