@@ -105,7 +105,7 @@ bugfixes and improvements, and submitting pull requests to the project.
 
 ## License
 
-&copy; Axiom, Inc., 2021
+&copy; Axiom, Inc., 2022
 
 Distributed under MIT License (`The MIT License`).
 
