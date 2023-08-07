@@ -6,11 +6,15 @@ builds:
       main: ./cmd/axiom-syslog-proxy
       env:
         - CGO_ENABLED=0
+      tags:
+        - osusergo
+        - netgo
+        - static_build
       flags:
+        - -buildvcs=false
         - -buildmode=pie
         - -installsuffix=cgo
         - -trimpath
-        - -tags="osusergo netgo static_build"
       ldflags:
         - -s -w -extldflags "-fno-PIC -static -Wl -z now -z relro"
         - -X github.com/axiomhq/pkg/version.release={{ .Version }}
@@ -32,13 +36,13 @@ builds:
     goarch:
       - amd64
       - arm64
-    
+
   - <<: *build_defaults
     flags:
+      - -buildvcs=false
       - -buildmode=exe
       - -installsuffix=cgo
       - -trimpath
-      - -tags="osusergo netgo static_build"
     id: linux-no-pie
     goos:
       - linux
@@ -48,13 +52,13 @@ builds:
     goarm:
       - 6
       - 7
-  
+
   - <<: *build_defaults
     flags:
+      - -buildvcs=false
       - -buildmode=exe
       - -installsuffix=cgo
       - -trimpath
-      - -tags="osusergo netgo static_build"
     id: docker
     goos:
       - linux
@@ -72,6 +76,7 @@ builds:
 archives:
   - <<: &archive_defaults
       name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+      rlcp: true
     id: nix
     builds:
       - darwin
@@ -99,11 +104,7 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 
 changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
+  use: github-native
 
 milestones:
   - repo:
@@ -140,7 +141,24 @@ dockers:
   - ids:
       - docker
     image_templates:
-    - "axiomhq/axiom-syslog-proxy:{{ .Major }}"
-    - "axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}"
-    - "axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-    - "axiomhq/axiom-syslog-proxy:latest"
+      - "docker.io/axiomhq/axiom-syslog-proxy:{{ .Major }}"
+      - "docker.io/axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}"
+      - "docker.io/axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "docker.io/axiomhq/axiom-syslog-proxy:latest"
+      - "ghcr.io/axiomhq/axiom-syslog-proxy:{{ .Major }}"
+      - "ghcr.io/axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/axiomhq/axiom-syslog-proxy:{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
+      - "ghcr.io/axiomhq/axiom-syslog-proxy:latest"
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://axiom.co
+      - --label=org.opencontainers.image.source=https://github.com/axiomhq/axiom-syslog-proxy
+      - --label=org.opencontainers.image.documentation=https://github.com/axiomhq/axiom-syslog-proxy
+      - --label=org.opencontainers.image.licenses=MIT
+      - --label=org.opencontainers.image.author=Axiom, Inc. <info@axiom.co>
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.vendor=Axiom, Inc.
