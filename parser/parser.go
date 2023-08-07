@@ -1,13 +1,5 @@
 package parser
 
-import (
-	lru "github.com/hashicorp/golang-lru"
-
-	"github.com/axiomhq/logmanager"
-)
-
-var logger = logmanager.GetLogger("api.parser")
-
 // Parser ...
 type Parser interface {
 	WriteLine(line []byte, remoteIP string)
@@ -19,15 +11,12 @@ type Parser interface {
 type ProcessLogFunc func(msg *Log)
 
 type parser struct {
-	lookups *lru.Cache
 	emitLog ProcessLogFunc
 }
 
 // New ...
 func New(cb ProcessLogFunc) Parser {
-	lookups, _ := lru.New(1000)
 	return &parser{
-		lookups: lookups,
 		emitLog: cb,
 	}
 }

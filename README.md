@@ -1,127 +1,66 @@
-# Axiom Syslog Proxy
+![axiom-syslog-proxy: Syslog ingestion by proxy for Axiom](.github/images/banner-dark.svg#gh-dark-mode-only)
+![axiom-syslog-proxy: Syslog ingestion by proxy for Axiom](.github/images/banner-light.svg#gh-light-mode-only)
 
-[![Go Workflow][go_workflow_badge]][go_workflow]
-[![Coverage Status][coverage_badge]][coverage]
-[![Go Report][report_badge]][report]
+<div align="center">
+
+[![Documentation][docs_badge]][docs]
+[![Go Workflow][workflow_badge]][workflow]
 [![Latest Release][release_badge]][release]
 [![License][license_badge]][license]
-[![Docker][docker_badge]][docker]
 
----
+</div>
 
-## Table of Contents
+[Axiom](https://axiom.co) unlocks observability at any scale.
 
-1. [Introduction](#introduction)
-1. [Usage](#usage)
-1. [Contributing](#contributing)
-1. [License](#license)
+- **Ingest with ease, store without limits:** Axiom's next-generation datastore
+  enables ingesting petabytes of data with ultimate efficiency. Ship logs from
+  Kubernetes, AWS, Azure, Google Cloud, DigitalOcean, Nomad, and others.
+- **Query everything, all the time:** Whether DevOps, SecOps, or EverythingOps,
+  query all your data no matter its age. No provisioning, no moving data from
+  cold/archive to "hot", and no worrying about slow queries. All your data, all.
+  the. time.
+- **Powerful dashboards, for continuous observability:** Build dashboards to
+  collect related queries and present information that's quick and easy to
+  digest for you and your team. Dashboards can be kept private or shared with
+  others, and are the perfect way to bring together data from different sources.
 
-## Introduction
-
-_Axiom Syslog Proxy_ ships logs to Axiom, acting as a Syslog server.
-
-## Installation
-
-### Download the pre-compiled and archived binary manually
-
-Binary releases are available on [GitHub Releases][2].
-
-  [2]: https://github.com/axiomhq/axiom-syslog-proxy/releases/latest
-
-### Install using [Homebrew](https://brew.sh)
-
-```shell
-brew tap axiomhq/tap
-brew install axiom-syslog-proxy
-```
-
-To update:
-
-```shell
-brew update
-brew upgrade axiom-syslog-proxy
-```
-
-### Install using `go get`
-
-```shell
-go get -u github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-proxy
-```
-
-### Install from source
-
-```shell
-git clone https://github.com/axiomhq/axiom-syslog-proxy.git
-cd axiom-syslog-proxy
-make install
-```
-
-### Run the Docker image
-
-Docker images are available on [DockerHub][docker].
+For more information check out the
+[official documentation](https://axiom.co/docs) and our
+[community Discord](https://axiom.co/discord).
 
 ## Usage
 
-1. Set the following environment variables to connect to Axiom Cloud:
+There are multiple ways you can install the Axiom Syslog Proxy:
 
-* `AXIOM_TOKEN`: **Personal Access** or **Ingest** token. Can be created under
-  `Profile` or `Settings > Ingest Tokens`. For security reasons it is advised to
-  use an Ingest Token with minimal privileges only.
-* `AXIOM_ORG_ID`: The organization identifier of the organization to use
-* `AXIOM_DATASET`: Dataset to ship the logs to
+- With Homebrew: `brew install axiomhq/tap/axiom-syslog-proxy`
+- Download the pre-built binary from the
+  [GitHub Releases](https://github.com/axiomhq/axiom-syslog-proxy/releases/latest)
+- Using Go: `go install github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-prox@latest`
+- Use the [Docker image](https://hub.docker.com/r/axiomhq/axiom-syslog-proxy): `docker run axiomhq/axiom-syslog-proxy`
 
-When using Axiom Selfhost:
+### Configuration
 
-* `AXIOM_TOKEN`: **Personal Access** or **Ingest** token. Can be created under
-  `Profile` or `Settings > Ingest Tokens`. For security reasons it is advised to
-  use an Ingest Token with minimal privileges only.
-* `AXIOM_URL`: URL of the Axiom deployment to use
-* `AXIOM_DATASET`: Dataset to ship the logs to
+If you use the [Axiom CLI](https://github.com/axiomhq/cli), run
+`eval $(axiom config export -f)` to configure your environment variables.
 
-2. Run it: `./axiom-syslog-proxy` or using Docker:
+Otherwise create a personal token in [the Axiom settings](https://app.axiom.co/profile)
+and export it as `AXIOM_TOKEN`. Set `AXIOM_ORG_ID` to the organization ID from
+the settings page of the organization you want to access.
 
-```shell
-docker run -p601:601/tcp -p514:514/udp  \
-  -e=AXIOM_TOKEN=<YOUR_AXIOM_TOKEN>     \
-  -e=AXIOM_DATASET=<YOUR_AXIOM_DATASET> \
-  axiomhq/axiom-syslog-proxy
-```
-
-3. Test it:
-
-```shell
-echo -n "tcp message" | nc -w1 localhost 601
-echo -n "udp message" | nc -u -w1 localhost 514
-```
-
-## Contributing
-
-Feel free to submit PRs or to fill issues. Every kind of help is appreciated. 
-
-Before committing, `make` should run without any issues.
-
-Kindly check our [Contributing](Contributing.md) guide on how to propose
-bugfixes and improvements, and submitting pull requests to the project.
+Export the dataset name to ingest into as `AXIOM_DATASET`. The dataset must
+exist prior to ingesting data into it.
 
 ## License
 
-&copy; Axiom, Inc., 2022
-
-Distributed under MIT License (`The MIT License`).
-
-See [LICENSE](LICENSE) for more information.
+Distributed under the [MIT License](./LICENSE).
 
 <!-- Badges -->
 
-[go_workflow]: https://github.com/axiomhq/axiom-syslog-proxy/actions/workflows/push.yml
-[go_workflow_badge]: https://img.shields.io/github/workflow/status/axiomhq/axiom-syslog-proxy/Push?style=flat-square&ghcache=unused
-[coverage]: https://codecov.io/gh/axiomhq/axiom-syslog-proxy
-[coverage_badge]: https://img.shields.io/codecov/c/github/axiomhq/axiom-syslog-proxy.svg?style=flat-square&ghcache=unused
-[report]: https://goreportcard.com/report/github.com/axiomhq/axiom-syslog-proxy
-[report_badge]: https://goreportcard.com/badge/github.com/axiomhq/axiom-syslog-proxy?style=flat-square&ghcache=unused
+[docs]: https://docs.axiom.co
+[docs_badge]: https://img.shields.io/badge/docs-reference-blue.svg
+[workflow]: https://github.com/axiomhq/axiom-syslog-proxy/actions/workflows/push.yaml
+[workflow_badge]: https://img.shields.io/github/actions/workflow/status/axiomhq/axiom-syslog-proxy/push.yaml?branch=main&ghcache=unused
 [release]: https://github.com/axiomhq/axiom-syslog-proxy/releases/latest
-[release_badge]: https://img.shields.io/github/release/axiomhq/axiom-syslog-proxy.svg?style=flat-square&ghcache=unused
+[release_badge]: https://img.shields.io/github/release/axiomhq/axiom-syslog-proxy.svg
 [license]: https://opensource.org/licenses/MIT
-[license_badge]: https://img.shields.io/github/license/axiomhq/axiom-syslog-proxy.svg?color=blue&style=flat-square&ghcache=unused
-[docker]: https://hub.docker.com/r/axiomhq/axiom-syslog-proxy
-[docker_badge]: https://img.shields.io/docker/pulls/axiomhq/axiom-syslog-proxy.svg?style=flat-square&ghcache=unused
+[license_badge]: https://img.shields.io/github/license/axiomhq/axiom-syslog-proxy.svg?color=blue

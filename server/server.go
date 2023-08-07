@@ -3,18 +3,17 @@ package server
 import (
 	"context"
 	"io"
+	"log"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/axiomhq/axiom-go/axiom"
-	"github.com/axiomhq/logmanager"
+	"github.com/axiomhq/axiom-go/axiom/ingest"
 
 	"github.com/axiomhq/axiom-syslog-proxy/input"
 	"github.com/axiomhq/axiom-syslog-proxy/parser"
 )
-
-var logger = logmanager.GetLogger("server.server")
 
 const maxQueueSize = 1024
 
@@ -68,7 +67,7 @@ func (srv *Server) onLogMessage(log *parser.Log) {
 func LogToEvent(log *parser.Log) axiom.Event {
 	ev := axiom.Event{}
 
-	ev[axiom.TimestampField] = log.Timestamp
+	ev[ingest.TimestampField] = log.Timestamp
 	ev[fieldSeverity] = strings.ToLower(parser.Severity(log.Severity).String())
 
 	if log.Application != "" {
@@ -101,19 +100,19 @@ func (srv *Server) Flush() error {
 		return nil
 	}
 
-	status, err := srv.client.Datasets.IngestEvents(ctx, srv.config.Dataset, axiom.IngestOptions{}, srv.queue...)
-	if logger.IsError(err) {
+	status, err := srv.client.Datasets.IngestEvents(ctx, srv.config.Dataset, srv.queue)
+	if err != nil {
 		return err
 	}
 
-	logger.Trace("ingested %d event(s)", status.Ingested)
+	log.Printf("ingested %d event(s)", status.Ingested)
 	srv.queue = make([]axiom.Event, 0, maxQueueSize)
 	return nil
 }
 
 func (srv *Server) Run() {
 	if srv.started {
-		logger.Info("server already running")
+		log.Print("server already running")
 		return
 	}
 

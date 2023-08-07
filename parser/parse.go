@@ -3,6 +3,7 @@ package parser
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 	"time"
@@ -33,9 +34,7 @@ func ParseLineWithFallback(line []byte, remoteAddr string) *Log {
 		m, err = parseJSON(jsonMsg)
 		// if the message is not valid json, fallback to syslog
 		if err != nil {
-			if logger.IsDebugEnabled() {
-				logger.Debug("Unable to parse log line, err=%q: %s", err, string(line))
-			}
+			log.Printf("Unable to parse log line, err=%q: %s", err, line)
 			m, err = parseSyslogLine(line)
 		}
 	} else {
@@ -43,9 +42,8 @@ func ParseLineWithFallback(line []byte, remoteAddr string) *Log {
 	}
 
 	if err != nil {
-		if logger.IsDebugEnabled() {
-			logger.Debug("Unable to parse log line: %s", string(line))
-		}
+		log.Printf("Unable to parse log line: %s", line)
+
 		if err == errCorruptedData {
 			return nil
 		}
@@ -233,8 +231,10 @@ func extractMetadataValue(concatKey string, value []byte, dataType jsonparser.Va
 			return parseErr
 		}
 		msg.Metadata[concatKey] = stringValue
+	case jsonparser.NotExist, jsonparser.Null, jsonparser.Unknown:
+		fallthrough
 	default:
-		logger.Warn("JSON type %v is unsupported", dataType)
+		log.Printf("JSON type %v is unsupported", dataType)
 	}
 	return nil
 }
@@ -339,7 +339,6 @@ func extractSeverity(text string) int32 {
 // After calling this, the only severities a message will have are:
 // Error, Warning, Info, Debug, or Trace
 // These are the ones that have corressponding UX stuff in the dashboard (colours etc)
-//
 func populateSeverity(msg *Log) {
 	if msg.Severity == Unknown {
 		msg.Severity = Info

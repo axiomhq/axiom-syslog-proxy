@@ -24,10 +24,7 @@ func main() {
 	)
 }
 
-func run(ctx context.Context, log *zap.Logger, client *axiom.Client) error {
-	// Export `AXIOM_TOKEN`, `AXIOM_ORG_ID` and `AXIOM_DATASET` for Axiom Cloud.
-	// Export `AXIOM_URL`, `AXIOM_TOKEN` and `AXIOM_DATASET` for Axiom Selfhost.
-
+func run(_ context.Context, _ *zap.Logger, client *axiom.Client) error {
 	flag.Parse()
 
 	config := &server.Config{
