@@ -1,14 +1,9 @@
-# Production image based on alpine.
-FROM alpine
+# Production image based on distroless.
+FROM gcr.io/distroless/static-debian11:nonroot
 LABEL maintainer="Axiom, Inc. <info@axiom.co>"
 
-# Upgrade packages and install ca-certificates.
-RUN apk update --no-cache && \
-    apk upgrade --no-cache && \
-    apk add --no-cache ca-certificates
-
 # Copy binary into image.
-COPY axiom-syslog-proxy /usr/bin/axiom-syslog-proxy
+COPY --chown=nonroot:nonroot axiom-syslog-proxy /usr/bin/axiom-syslog-proxy
 
 # Use the project name as working directory.
 WORKDIR /axiom-syslog-proxy
