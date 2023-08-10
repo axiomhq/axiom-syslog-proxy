@@ -1,9 +1,9 @@
 # Production image based on distroless.
-FROM gcr.io/distroless/static-debian11:nonroot
+FROM gcr.io/distroless/static-debian11
 LABEL maintainer="Axiom, Inc. <info@axiom.co>"
 
 # Copy binary into image.
-COPY --chown=nonroot:nonroot axiom-syslog-proxy /usr/bin/axiom-syslog-proxy
+COPY axiom-syslog-proxy /usr/bin/axiom-syslog-proxy
 
 # Use the project name as working directory.
 WORKDIR /axiom-syslog-proxy
