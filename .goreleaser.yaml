@@ -76,7 +76,6 @@ builds:
 archives:
   - <<: &archive_defaults
       name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-      rlcp: true
     id: nix
     builds:
       - darwin
@@ -125,7 +124,7 @@ brews:
     description: Syslog ingestion by proxy for Axiom
     homepage: https://axiom.co
     license: MIT
-    tap:
+    repository:
       owner: axiomhq
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TOKEN }}"
