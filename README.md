@@ -48,16 +48,9 @@ There are multiple ways you can install the Axiom Syslog Proxy:
 If you use the [Axiom CLI](https://github.com/axiomhq/cli), run
 `eval $(axiom config export -f)` to configure your environment variables.
 
-Otherwise create an api token with the appropriate scopes in
-[the Axiom API tokens settings](https://app.axiom.co/settings/api-tokens) and
+Otherwise create an API token with the appropriate scopes in
+[the Axiom API token settings](https://app.axiom.co/settings/api-tokens) and
 export it as `AXIOM_TOKEN`.
-
-When using a personal token, export it as `AXIOM_TOKEN` and set `AXIOM_ORG_ID`
-to the organization ID from the settings page of the organization you want to
-access.
-
-_❗ We recommend to follow security best-practices and use an **api token with
-minimal privileges**, only!_
 
 Export the dataset name to ingest into as `AXIOM_DATASET`. The dataset must
 exist prior to ingesting data into it.
