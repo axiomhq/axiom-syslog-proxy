@@ -40,7 +40,7 @@ There are multiple ways you can install the Axiom Syslog Proxy:
 - With Homebrew: `brew install axiomhq/tap/axiom-syslog-proxy`
 - Download the pre-built binary from the
   [GitHub Releases](https://github.com/axiomhq/axiom-syslog-proxy/releases/latest)
-- Using Go: `go install github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-prox@latest`
+- Using Go: `go install github.com/axiomhq/axiom-syslog-proxy/cmd/axiom-syslog-proxy@latest`
 - Use the [Docker image](https://hub.docker.com/r/axiomhq/axiom-syslog-proxy): `docker run axiomhq/axiom-syslog-proxy`
 
 ### Configuration
