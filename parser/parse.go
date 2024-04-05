@@ -146,7 +146,7 @@ func parseJSON(data []byte) (*Log, error) {
 		Metadata: map[string]interface{}{},
 	}
 
-	if err := jsonparser.ObjectEach(data, func(key []byte, value []byte, dataType jsonparser.ValueType, offset int) error {
+	if err := jsonparser.ObjectEach(data, func(key []byte, value []byte, dataType jsonparser.ValueType, _ int) error {
 		return extractJSONProperty(key, value, dataType, msg)
 	}); err != nil {
 		return nil, err
@@ -197,7 +197,7 @@ func extractMetadataValue(concatKey string, value []byte, dataType jsonparser.Va
 	switch dataType {
 	case jsonparser.Object:
 		level++
-		if err := jsonparser.ObjectEach(value, func(kk []byte, vv []byte, dtdt jsonparser.ValueType, offset int) error {
+		if err := jsonparser.ObjectEach(value, func(kk []byte, vv []byte, dtdt jsonparser.ValueType, _ int) error {
 			return extractMetadataValue(joinKey(concatKey, string(kk)), vv, dtdt, level, msg)
 		}); err != nil {
 			return err
@@ -205,7 +205,7 @@ func extractMetadataValue(concatKey string, value []byte, dataType jsonparser.Va
 	case jsonparser.Array:
 		arrayIndex := 0
 		level++
-		if _, err := jsonparser.ArrayEach(value, func(vv []byte, dtdt jsonparser.ValueType, offset int, err error) {
+		if _, err := jsonparser.ArrayEach(value, func(vv []byte, dtdt jsonparser.ValueType, _ int, err error) {
 			if err != nil {
 				return
 			}

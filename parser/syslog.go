@@ -570,10 +570,10 @@ func parseStructuredData(data []byte, index *int, length *int) (map[string]map[s
 	sc := scanner.Scanner{}
 	sc.Init(bytes.NewBuffer(data[offset+1:]))
 	sc.Mode = scanner.ScanStrings | scanner.ScanIdents
-	sc.IsIdentRune = func(ch rune, i int) bool {
+	sc.IsIdentRune = func(ch rune, _ int) bool {
 		return unicode.IsLetter(ch) || unicode.IsDigit(ch) || ch == '@' || ch == '.'
 	}
-	sc.Error = func(s *scanner.Scanner, msg string) {}
+	sc.Error = func(_ *scanner.Scanner, _ string) {}
 
 	var (
 		sdID, sdParam string
