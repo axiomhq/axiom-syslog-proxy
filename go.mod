@@ -1,6 +1,6 @@
 module github.com/axiomhq/axiom-syslog-proxy
 
-go 1.21
+go 1.22
 
 require (
 	github.com/axiomhq/axiom-go v0.16.2
