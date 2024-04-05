@@ -132,7 +132,7 @@ brews:
       name: axiom-automation
       email: hello@axiom.co
     skip_upload: auto
-    folder: Formula
+    directory: Formula
     install: bin.install "{{ .ProjectName }}"
     test: assert_match "x", "x"
 
