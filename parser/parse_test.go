@@ -694,7 +694,7 @@ func BenchmarkParserDifferentMetadataTypes(b *testing.B) {
 }
 
 func BenchmarkParser(b *testing.B) {
-	p := New(func(msg *Log) {})
+	p := New(func(_ *Log) {})
 
 	const msg = "<1> 2009-10-16T11:51:56+02:00 ip-34-23-211-23 symbolicator ERROR 2008 SOMEMSG - hello"
 	rawMsg := []byte(msg)
