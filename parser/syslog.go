@@ -303,7 +303,7 @@ func parseRFC5424(msg *Log, data []byte, length int) error {
 	if !valid {
 		return errCorruptedData
 	}
-	msg.Text = cleanString(textData, false)
+	msg.Text = textData
 
 	parseMetadata(msg, data[i:])
 
