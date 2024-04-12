@@ -105,6 +105,24 @@ func (s *ParseTestSuite) TestParseJson() {
 			severity:    int64(Trace),
 			metadata:    map[string]interface{}{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
 		},
+		{
+			raw:         []byte(fmt.Sprintf("<34>1 %s mymachine.example.com su - ID47 - {\"level\":\"error\",\"service\":\"public-service\",\"env\":\"production\",\"error\":\"fail\",\"time\":\"2024-04-05T05:47:24Z\",\"req_id\":\"req-id\",\"message_inside\":\"this will work due to \\\" quote foobar\"}", nowFormatted)),
+			time:        now,
+			application: "su",
+			hostname:    "mymachine.example.com",
+			text:        "{\"level\":\"error\",\"service\":\"public-service\",\"env\":\"production\",\"error\":\"fail\",\"time\":\"2024-04-05T05:47:24Z\",\"req_id\":\"req-id\",\"message_inside\":\"this will work due to \\\" quote foobar\"}",
+			severity:    int64(Error),
+			metadata:    map[string]interface{}{"error": "fail", "time": "2024-04-05T05:47:24Z", "req_id": "req-id", "message_inside": "this will work due to \" quote foobar", "service": "public-service", "env": "production"},
+		},
+		{
+			raw:         []byte(fmt.Sprintf("<34>1 %s mymachine.example.com su - ID47 - {\"level\":\"error\",\"service\":\"public-service\",\"env\":\"production\",\"error\":\"fail\",\"time\":\"2024-04-05T05:47:24Z\",\"req_id\":\"req-id\",\"message\":\"this will work due to \\\" quote foobar\"}", nowFormatted)),
+			time:        now,
+			application: "su",
+			hostname:    "mymachine.example.com",
+			text:        "this will work due to \" quote foobar",
+			severity:    int64(Error),
+			metadata:    map[string]interface{}{"service": "public-service", "env": "production", "error": "fail", "time": "2024-04-05T05:47:24Z", "req_id": "req-id"},
+		},
 	}
 
 	for number, c := range cases {
