@@ -122,6 +122,8 @@ func (srv *Server) Run(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
+			srv.tcpCloser.Close()
+			srv.udpCloser.Close()
 			srv.Flush()
 			return
 		case <-ticker.C:
