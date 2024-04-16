@@ -4,8 +4,6 @@ import (
 	"context"
 	"flag"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/axiomhq/axiom-go/axiom"
 	"github.com/axiomhq/pkg/cmd"
@@ -40,15 +38,7 @@ func run(ctx context.Context, _ *zap.Logger, client *axiom.Client) error {
 		return cmd.Error("create server", err)
 	}
 
-	// Setup cancellation context that will be cancelled on receiving a signal
-	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+	srv.Run(ctx)
 
-	go func() {
-		srv.Run()
-	}()
-
-	<-ctx.Done()
-
-	return ctx.Err()
+	return nil
 }

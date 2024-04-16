@@ -110,7 +110,7 @@ func (srv *Server) Flush() error {
 	return nil
 }
 
-func (srv *Server) Run() {
+func (srv *Server) Run(ctx context.Context) {
 	if srv.started {
 		log.Print("server already running")
 		return
@@ -118,11 +118,11 @@ func (srv *Server) Run() {
 
 	srv.started = true
 	ticker := time.NewTicker(5 * time.Second)
-	done := make(chan bool)
 
 	for {
 		select {
-		case <-done:
+		case <-ctx.Done():
+			srv.Flush()
 			return
 		case <-ticker.C:
 			srv.Flush()
