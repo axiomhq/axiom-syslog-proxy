@@ -27,7 +27,7 @@ type Case struct {
 	hostname      string
 	application   string
 	text          string
-	metadata      map[string]interface{}
+	metadata      map[string]any
 	metadataLTLen int
 	imprecise     bool
 	severity      int64
@@ -41,87 +41,87 @@ func (s *ParseTestSuite) TestParseJson() {
 
 	cases := []*Case{
 		{
-			raw:         []byte(fmt.Sprintf(`{"severity":"info", "data" : [0,"one",{"number":"deux"}, 3.3, false], "annoy[ing]": "value", "artist": "Tomonari Nozaki", "album": "North Palace", "message": "Favourite album", "application":"logstash", "hostname":"forwind.net", "timestamp": "%s"}`, nowFormatted)),
+			raw:         fmt.Appendf(nil, `{"severity":"info", "data" : [0,"one",{"number":"deux"}, 3.3, false], "annoy[ing]": "value", "artist": "Tomonari Nozaki", "album": "North Palace", "message": "Favourite album", "application":"logstash", "hostname":"forwind.net", "timestamp": "%s"}`, nowFormatted),
 			application: "logstash",
 			time:        now,
 			hostname:    "forwind.net",
 			text:        "Favourite album",
 			severity:    int64(Info),
-			metadata:    map[string]interface{}{"\"annoy[ing]\"": "value", "artist": "Tomonari Nozaki", "album": "North Palace", "data[0]": int64(0), "data[1]": "one", "data[2].number": "deux", "data[3]": 3.3, "data[4]": "false"},
+			metadata:    map[string]any{"\"annoy[ing]\"": "value", "artist": "Tomonari Nozaki", "album": "North Palace", "data[0]": int64(0), "data[1]": "one", "data[2].number": "deux", "data[3]": 3.3, "data[4]": "false"},
 		},
 		{
-			raw:         []byte(fmt.Sprintf(`{"syslog.severity":"info", "oh.no": ":(", "oh": {"no[7]": ":((("}, "artist": "Fourth Page", "album": "Along the weak rope", "Msg": "Least Favourite album", "app":"logstash", "host":"forwind.net", "Timestamp": "%s"}`, nowFormatted)),
+			raw:         fmt.Appendf(nil, `{"syslog.severity":"info", "oh.no": ":(", "oh": {"no[7]": ":((("}, "artist": "Fourth Page", "album": "Along the weak rope", "Msg": "Least Favourite album", "app":"logstash", "host":"forwind.net", "Timestamp": "%s"}`, nowFormatted),
 			application: "logstash",
 			time:        now,
 			hostname:    "forwind.net",
 			text:        "Least Favourite album",
 			severity:    int64(Info),
-			metadata:    map[string]interface{}{"artist": "Fourth Page", "album": "Along the weak rope", "oh.\"no[7]\"": ":(((", "\"oh.no\"": ":("},
+			metadata:    map[string]any{"artist": "Fourth Page", "album": "Along the weak rope", "oh.\"no[7]\"": ":(((", "\"oh.no\"": ":("},
 		},
 		{
-			raw:         []byte(fmt.Sprintf(`{"level":"debug", "msg": "Best recent 1", "a.h[a]": {"ta.ke" : ["on", "m.e"], "float": 4.3, "bo[ol]" : false}, "artist": "Rune Clausen", "album": "Tones Jul", "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted)),
+			raw:         fmt.Appendf(nil, `{"level":"debug", "msg": "Best recent 1", "a.h[a]": {"ta.ke" : ["on", "m.e"], "float": 4.3, "bo[ol]" : false}, "artist": "Rune Clausen", "album": "Tones Jul", "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted),
 			time:        now,
 			application: "logstash",
 			hostname:    "forwind.net",
 			text:        "Best recent 1",
 			severity:    int64(Debug),
-			metadata:    map[string]interface{}{"artist": "Rune Clausen", "album": "Tones Jul", "\"a.h[a]\".\"ta.ke\"[0]": "on", "\"a.h[a]\".\"ta.ke\"[1]": "m.e", "\"a.h[a]\".float": 4.3, "\"a.h[a]\".\"bo[ol]\"": "false"},
+			metadata:    map[string]any{"artist": "Rune Clausen", "album": "Tones Jul", "\"a.h[a]\".\"ta.ke\"[0]": "on", "\"a.h[a]\".\"ta.ke\"[1]": "m.e", "\"a.h[a]\".float": 4.3, "\"a.h[a]\".\"bo[ol]\"": "false"},
 		},
 		{
-			raw:         []byte(fmt.Sprintf(`{"level":"trace", "msg": "Best recent 2", "artist": "Rune Clausen", "album": "Tones Jul", "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted)),
+			raw:         fmt.Appendf(nil, `{"level":"trace", "msg": "Best recent 2", "artist": "Rune Clausen", "album": "Tones Jul", "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted),
 			time:        now,
 			application: "logstash",
 			hostname:    "forwind.net",
 			text:        "Best recent 2",
 			severity:    int64(Trace),
-			metadata:    map[string]interface{}{"artist": "Rune Clausen", "album": "Tones Jul"},
+			metadata:    map[string]any{"artist": "Rune Clausen", "album": "Tones Jul"},
 		},
 		{
-			raw:         []byte(fmt.Sprintf(`{"level":"trace", "msg": "Best recent 3", "bool": true, "forwind": {"favourites":  {"artist" : "Rune Clausen", "album": "Blindlight", "release" : { "duration" : 100, "catno" : "fwd09", "link" : { "url" : "http://www.forwind.net", "type" : {"origin": "home", "ignore": {"this": "we shouldn't parse this"}}}}}}, "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted)),
+			raw:         fmt.Appendf(nil, `{"level":"trace", "msg": "Best recent 3", "bool": true, "forwind": {"favourites":  {"artist" : "Rune Clausen", "album": "Blindlight", "release" : { "duration" : 100, "catno" : "fwd09", "link" : { "url" : "http://www.forwind.net", "type" : {"origin": "home", "ignore": {"this": "we shouldn't parse this"}}}}}}, "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted),
 			time:        now,
 			application: "logstash",
 			hostname:    "forwind.net",
 			text:        "Best recent 3",
 			severity:    int64(Trace),
-			metadata:    map[string]interface{}{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
+			metadata:    map[string]any{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
 		},
 		// JSON encoded in syslog
 		{
-			raw:         []byte(fmt.Sprintf(`<14> overrideme: {"level":"trace", "msg": "Best recent 3", "bool": true, "forwind": {"favourites":  {"artist" : "Rune Clausen", "album": "Blindlight", "release" : { "duration" : 100, "catno" : "fwd09", "link" : { "url" : "http://www.forwind.net", "type" : {"origin": "home", "ignore": {"this": "we shouldn't parse this"}}}}}}, "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted)),
+			raw:         fmt.Appendf(nil, `<14> overrideme: {"level":"trace", "msg": "Best recent 3", "bool": true, "forwind": {"favourites":  {"artist" : "Rune Clausen", "album": "Blindlight", "release" : { "duration" : 100, "catno" : "fwd09", "link" : { "url" : "http://www.forwind.net", "type" : {"origin": "home", "ignore": {"this": "we shouldn't parse this"}}}}}}, "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted),
 			time:        now,
 			application: "logstash",
 			hostname:    "forwind.net",
 			text:        "Best recent 3",
 			severity:    int64(Trace),
-			metadata:    map[string]interface{}{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
+			metadata:    map[string]any{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
 		},
 		// JSON encoded in non valid syslog
 		{
-			raw:         []byte(fmt.Sprintf(`<14> overrideme: {"level":"trace", "msg": "Best recent 3", "bool": true, "forwind": {"favourites":  {"artist" : "Rune Clausen", "album": "Blindlight", "release" : { "duration" : 100, "catno" : "fwd09", "link" : { "url" : "http://www.forwind.net", "type" : {"origin": "home", "ignore": {"this": "we shouldn't parse this"}}}}}}, "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted)),
+			raw:         fmt.Appendf(nil, `<14> overrideme: {"level":"trace", "msg": "Best recent 3", "bool": true, "forwind": {"favourites":  {"artist" : "Rune Clausen", "album": "Blindlight", "release" : { "duration" : 100, "catno" : "fwd09", "link" : { "url" : "http://www.forwind.net", "type" : {"origin": "home", "ignore": {"this": "we shouldn't parse this"}}}}}}, "application":"logstash", "syslog.hostname":"forwind.net", "syslog.timestamp":"%s"}`, nowFormatted),
 			time:        now,
 			application: "logstash",
 			hostname:    "forwind.net",
 			text:        "Best recent 3",
 			severity:    int64(Trace),
-			metadata:    map[string]interface{}{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
+			metadata:    map[string]any{"forwind.favourites.artist": "Rune Clausen", "bool": "true", "forwind.favourites.release.link.type.origin": "home", "forwind.favourites.album": "Blindlight", "forwind.favourites.release.duration": int64(100), "forwind.favourites.release.catno": "fwd09", "forwind.favourites.release.link.url": "http://www.forwind.net"},
 		},
 		{
-			raw:         []byte(fmt.Sprintf("<34>1 %s mymachine.example.com su - ID47 - {\"level\":\"error\",\"service\":\"public-service\",\"env\":\"production\",\"error\":\"fail\",\"time\":\"2024-04-05T05:47:24Z\",\"req_id\":\"req-id\",\"message_inside\":\"this will work due to \\\" quote foobar\"}", nowFormatted)),
+			raw:         fmt.Appendf(nil, "<34>1 %s mymachine.example.com su - ID47 - {\"level\":\"error\",\"service\":\"public-service\",\"env\":\"production\",\"error\":\"fail\",\"time\":\"2024-04-05T05:47:24Z\",\"req_id\":\"req-id\",\"message_inside\":\"this will work due to \\\" quote foobar\"}", nowFormatted),
 			time:        now,
 			application: "su",
 			hostname:    "mymachine.example.com",
 			text:        "{\"level\":\"error\",\"service\":\"public-service\",\"env\":\"production\",\"error\":\"fail\",\"time\":\"2024-04-05T05:47:24Z\",\"req_id\":\"req-id\",\"message_inside\":\"this will work due to \\\" quote foobar\"}",
 			severity:    int64(Error),
-			metadata:    map[string]interface{}{"error": "fail", "time": "2024-04-05T05:47:24Z", "req_id": "req-id", "message_inside": "this will work due to \" quote foobar", "service": "public-service", "env": "production"},
+			metadata:    map[string]any{"error": "fail", "time": "2024-04-05T05:47:24Z", "req_id": "req-id", "message_inside": "this will work due to \" quote foobar", "service": "public-service", "env": "production"},
 		},
 		{
-			raw:         []byte(fmt.Sprintf("<34>1 %s mymachine.example.com su - ID47 - {\"level\":\"error\",\"service\":\"public-service\",\"env\":\"production\",\"error\":\"fail\",\"time\":\"2024-04-05T05:47:24Z\",\"req_id\":\"req-id\",\"message\":\"this will work due to \\\" quote foobar\"}", nowFormatted)),
+			raw:         fmt.Appendf(nil, "<34>1 %s mymachine.example.com su - ID47 - {\"level\":\"error\",\"service\":\"public-service\",\"env\":\"production\",\"error\":\"fail\",\"time\":\"2024-04-05T05:47:24Z\",\"req_id\":\"req-id\",\"message\":\"this will work due to \\\" quote foobar\"}", nowFormatted),
 			time:        now,
 			application: "su",
 			hostname:    "mymachine.example.com",
 			text:        "this will work due to \" quote foobar",
 			severity:    int64(Error),
-			metadata:    map[string]interface{}{"service": "public-service", "env": "production", "error": "fail", "time": "2024-04-05T05:47:24Z", "req_id": "req-id"},
+			metadata:    map[string]any{"service": "public-service", "env": "production", "error": "fail", "time": "2024-04-05T05:47:24Z", "req_id": "req-id"},
 		},
 	}
 
@@ -188,7 +188,7 @@ func (s *ParseTestSuite) TestParse() {
 			application: "src",
 			text:        `time="2018-06-02T17:16:14.392415523+01:00" bool=false level=info float=5.6 number=3 msg="[graphdriver] using prior storage driver: aufs"`,
 			imprecise:   true,
-			metadata:    map[string]interface{}{"time": "2018-06-02T17:16:14.392415523+01:00", "bool": "false", "level": "info", "float": float64(5.6), "number": int64(3)},
+			metadata:    map[string]any{"time": "2018-06-02T17:16:14.392415523+01:00", "bool": "false", "level": "info", "float": float64(5.6), "number": int64(3)},
 		},
 		{
 			raw:         []byte("<15>Jan  1 01:00:00 bzorp openvpn[2499]: PTHREAD support initialized"),
@@ -394,7 +394,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "mymachine.example.com",
 			application: "evntslog",
 			text:        "An application event log entry...",
-			metadata:    map[string]interface{}{"exampleSDID.iut": "3", "examplePriority.class": "high", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "Application"},
+			metadata:    map[string]any{"exampleSDID.iut": "3", "examplePriority.class": "high", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "Application"},
 		},
 		{
 			raw:         []byte("<6>1 2018-08-09T07:19:28.698693Z mymachine.example.com evntslog - ID47 - \xEF\xBB\xBFAn application event log entry..."),
@@ -402,7 +402,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "mymachine.example.com",
 			application: "evntslog",
 			text:        "An application event log entry...",
-			metadata:    map[string]interface{}{},
+			metadata:    map[string]any{},
 		},
 		{
 			raw:         []byte("<7>1 2006-10-29T01:59:59.156Z mymachine.example.com evntslog - ID47 [exampleSDID@0 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@0 class=\"high\"] \xEF\xBB\xBF An application event log entry..."),
@@ -410,7 +410,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "mymachine.example.com",
 			application: "evntslog",
 			text:        "An application event log entry...",
-			metadata:    map[string]interface{}{"exampleSDID.iut": "3", "examplePriority.class": "high", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "Application"},
+			metadata:    map[string]any{"exampleSDID.iut": "3", "examplePriority.class": "high", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "Application"},
 		},
 		{
 			raw:         []byte("<7>1 2006-10-29T01:59:59.156Z mymachine.example.com evntslog - ID47 [ exampleSDID@0 iut=\"3\" eventSource=\"App\\\"lication\\]\" eventID=\"1011\"][examplePriority@0 class=\"high_class\"] \xEF\xBB\xBF An application event log entry..."),
@@ -418,7 +418,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "mymachine.example.com",
 			application: "evntslog",
 			text:        "An application event log entry...",
-			metadata:    map[string]interface{}{"exampleSDID.iut": "3", "examplePriority.class": "high_class", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "App\"lication]"},
+			metadata:    map[string]any{"exampleSDID.iut": "3", "examplePriority.class": "high_class", "exampleSDID.eventID": "1011", "exampleSDID.eventSource": "App\"lication]"},
 		},
 		{
 			raw:           []byte("<7>1 2006-10-29T01:59:59.156Z mymachine.example.com evntslog - ID47 - Running executor with --project=axiom .env=development"),
@@ -458,7 +458,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
 			application: "MSExchange_ADAccess",
 			text:        "hello customer=njpatel@gmail.com source=web plan=\"professional plus\" foo= =bar hi",
-			metadata:    map[string]interface{}{"customer": "njpatel@gmail.com", "source": "web", "plan": "professional plus"},
+			metadata:    map[string]any{"customer": "njpatel@gmail.com", "source": "web", "plan": "professional plus"},
 		},
 		{
 			raw:         []byte("<134>1 2009-10-16T11:51:56+02:00 www web - - - \"customer id\"=\"njpatel@gmail.com\" \"source_app\"=web plan=\"professional plus\" foo= =bar = \"region\"="),
@@ -466,7 +466,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "www",
 			application: "web",
 			text:        "\"customer id\"=\"njpatel@gmail.com\" \"source_app\"=web plan=\"professional plus\" foo= =bar = \"region\"=",
-			metadata:    map[string]interface{}{"customer id": "njpatel@gmail.com", "source_app": "web", "plan": "professional plus"},
+			metadata:    map[string]any{"customer id": "njpatel@gmail.com", "source_app": "web", "plan": "professional plus"},
 		},
 		{
 			raw:         []byte("<134>1 2009-10-16T11:51:56+02:00 www web - - - customer=\"njpatel@gmail.com\" \"source_app\"=web plan=\"professional plus\" foo= =bar = =\"region\""),
@@ -474,7 +474,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "www",
 			application: "web",
 			text:        "customer=\"njpatel@gmail.com\" \"source_app\"=web plan=\"professional plus\" foo= =bar = =\"region\"",
-			metadata:    map[string]interface{}{"customer": "njpatel@gmail.com", "source_app": "web", "plan": "professional plus"},
+			metadata:    map[string]any{"customer": "njpatel@gmail.com", "source_app": "web", "plan": "professional plus"},
 		},
 		{
 			raw:           []byte("<134>1 2009-10-16T11:51:56+02:00 www dash - - - GET 403 /api/v1/logs?groups=&last-log=2018-06-22T15%3A21%3A47.085654-07%3A00&delta=100 localhost:8080 ip=::1"),
@@ -482,7 +482,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:      "www",
 			application:   "dash",
 			text:          "GET 403 /api/v1/logs?groups=&last-log=2018-06-22T15%3A21%3A47.085654-07%3A00&delta=100 localhost:8080 ip=::1",
-			metadata:      map[string]interface{}{"ip": "::1"},
+			metadata:      map[string]any{"ip": "::1"},
 			metadataLTLen: 2,
 		},
 		{
@@ -512,7 +512,7 @@ func (s *ParseTestSuite) TestParse() {
 			hostname:    "bar",
 			application: "elasticsearch",
 			text:        "[2018-06-19 11:08:00,000][DEBUG][gateway] [Blizzard II] recovered [0] indices into cluster_state foo=bar",
-			metadata: map[string]interface{}{
+			metadata: map[string]any{
 				"foo": "bar",
 			},
 		},
@@ -574,8 +574,8 @@ func (s *ParseTestSuite) TestRFC3164Dates() {
 		{raw: []byte("<34>Oct 1 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
 		{raw: []byte("<34>Oct  1 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
 		{raw: []byte("<34>Oct 01 22:14:15 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8")},
-		{raw: []byte(fmt.Sprintf("<34>%d-10-01T22:14:15Z mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8", time.Now().Year())), isUTC: true},
-		{raw: []byte(fmt.Sprintf("<34>%d-10-01T22:14:15+00:00 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8", time.Now().Year())), isUTC: true},
+		{raw: fmt.Appendf(nil, "<34>%d-10-01T22:14:15Z mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8", time.Now().Year()), isUTC: true},
+		{raw: fmt.Appendf(nil, "<34>%d-10-01T22:14:15+00:00 mymachine very.large.syslog.message.tag[2400]: 'su root' failed for lonvick on /dev/pts/8", time.Now().Year()), isUTC: true},
 	}
 
 	for _, f := range fixtures {
@@ -693,7 +693,7 @@ func (s *ParseTestSuite) TestExtractSeverity() {
 
 func Benchmark5424(b *testing.B) {
 	raw := []byte("<134>1 2009-10-16T11:51:56+02:00 ip-34-23-211-23 symbolicator 2008 SOMEMSG - hello")
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		msg, _ := parseSyslogLine(raw)
 		if msg == nil {
 			panic(errors.New("Unable to parse message"))
@@ -703,7 +703,7 @@ func Benchmark5424(b *testing.B) {
 
 func BenchmarkParserDifferentMetadataTypes(b *testing.B) {
 	raw := []byte(`<14> src time="2018-06-02T17:16:14.392415523+01:00" bool=false level=info float=5.6 number=3 msg="[graphdriver] using prior storage driver: aufs"`)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		msg, _ := parseSyslogLine(raw)
 		if msg == nil {
 			panic(errors.New("Unable to parse message"))
@@ -718,7 +718,7 @@ func BenchmarkParser(b *testing.B) {
 	rawMsg := []byte(msg)
 	raw := []byte("<999>h9:f6:m" + strconv.Itoa(len(msg)) + " localhost syslog " + msg)
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		// agent path
 		p.WriteLine(raw, "127.0.0.1")
 		// syslog path
@@ -728,7 +728,7 @@ func BenchmarkParser(b *testing.B) {
 
 func BenchmarkDateParse(b *testing.B) {
 	raw := []byte("<13>Jan  1 14:40:51 host app[24]: this is the message")
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		msg, _ := parseSyslogLine(raw)
 		if msg == nil {
 			panic(errors.New("Unable to parse message"))
@@ -738,7 +738,7 @@ func BenchmarkDateParse(b *testing.B) {
 
 func BenchmarkNoDateParse(b *testing.B) {
 	raw := []byte("<13>host app[24]: this is the message")
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		msg, _ := parseSyslogLine(raw)
 		if msg == nil {
 			panic(errors.New("Unable to parse message"))
@@ -757,7 +757,7 @@ func Benchmark_detectMaybeJSON(b *testing.B) {
 
 	for name, test := range tests {
 		b.Run(name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				detectMaybeJSON(test)
 			}
 		})

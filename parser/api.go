@@ -2,6 +2,7 @@ package parser
 
 import (
 	fmt "fmt"
+	"maps"
 	"strings"
 )
 
@@ -93,7 +94,7 @@ type Log struct {
 	Hostname    string
 	Application string
 	Text        string
-	Metadata    map[string]interface{}
+	Metadata    map[string]any
 }
 
 func (l *Log) Merge(other *Log) {
@@ -115,9 +116,7 @@ func (l *Log) Merge(other *Log) {
 	if other.Text != "" {
 		l.Text = other.Text
 	}
-	for k, v := range other.Metadata {
-		l.Metadata[k] = v
-	}
+	maps.Copy(l.Metadata, other.Metadata)
 }
 
 // PrettyPrint ...

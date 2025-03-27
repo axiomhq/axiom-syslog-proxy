@@ -50,7 +50,7 @@ const (
 func parseSyslog(data []byte) (*Log, error) {
 	msg := &Log{
 		Severity: Unknown,
-		Metadata: map[string]interface{}{},
+		Metadata: map[string]any{},
 	}
 
 	length := len(data)
@@ -74,14 +74,14 @@ func parseSyslog(data []byte) (*Log, error) {
 }
 
 func parseMetadata(msg *Log, data []byte) {
-	max := len(data)
-	if max < 3 {
+	maxLen := len(data)
+	if maxLen < 3 {
 		return
 	}
 
 	i := 0
-	for i < max {
-		if data[i] == '=' && i-1 > 0 && i+1 < max {
+	for i < maxLen {
+		if data[i] == '=' && i-1 > 0 && i+1 < maxLen {
 			if key := findKey(data[:i]); key != "" && metadataKeyRegex.MatchString(key) {
 				if val := findVal(data[i+1:]); val != nil {
 					success := false
@@ -149,7 +149,7 @@ func findKey(part []byte) string {
 }
 
 func findVal(part []byte) []byte {
-	max := len(part)
+	maxLen := len(part)
 	start := 0
 	i := 0
 	quoted := false
@@ -164,7 +164,7 @@ func findVal(part []byte) []byte {
 	}
 
 	// We look forwards for the key
-	for i < max {
+	for i < maxLen {
 		switch part[i] {
 		case ' ':
 			if !quoted {
@@ -179,7 +179,7 @@ func findVal(part []byte) []byte {
 
 		i++
 
-		if i >= max && !quoted {
+		if i >= maxLen && !quoted {
 			return part[start:]
 		}
 	}
@@ -316,7 +316,7 @@ func cleanString(s string, unquote bool) string {
 			s = unquoted
 		}
 	}
-	return strings.Replace(s, "\\", "", -1)
+	return strings.ReplaceAll(s, "\\", "")
 }
 
 func parseApplication(app string) string {
@@ -332,7 +332,7 @@ func parseColumn(data []byte, index *int, length *int) []byte {
 
 	var space int
 	var j int
-	for j = 0; j < l; j++ {
+	for j = range l {
 		if data[i+j] == ' ' {
 			space = j
 			break
@@ -519,10 +519,7 @@ func parseDate(msg *Log, dateFormat dateFormatType, data []byte, index *int, len
 	if timeStrLen > 0 {
 		timeStr = string(data[i : i+timeStrLen])
 	} else {
-		maxIdx := i + len(formats[0])
-		if maxIdx > len(data) {
-			maxIdx = len(data)
-		}
+		maxIdx := min(i+len(formats[0]), len(data))
 		timeStr = string(data[i:maxIdx])
 	}
 
@@ -626,7 +623,7 @@ scannerLoop:
 				break scannerLoop
 			}
 
-			nextIdx := offset + 1 + sc.Position.Offset + 1
+			nextIdx := offset + 1 + sc.Offset + 1
 			if nextIdx >= len(data) {
 				// the loop will end with EOF
 				sdEndIdx = nextIdx
@@ -729,7 +726,7 @@ func parseSequenceID(msg *Log, data []byte, index *int, length *int) bool {
 	}
 
 	if msg.Metadata == nil {
-		msg.Metadata = make(map[string]interface{})
+		msg.Metadata = make(map[string]any)
 	}
 	msg.Metadata["SequenceID"] = string(data[*index : i-1])
 
