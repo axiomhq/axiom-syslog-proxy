@@ -1,5 +1,7 @@
 package parser
 
+import "maps"
+
 func parseApp(msg *Log) {
 	switch msg.Application {
 	case "auth", "daemon", "kern", "syslog":
@@ -15,8 +17,6 @@ func parseSystemd(msg *Log) {
 		msg.Application = m.Application
 		msg.Text = m.Text
 
-		for k, v := range m.Metadata {
-			msg.Metadata[k] = v
-		}
+		maps.Copy(msg.Metadata, m.Metadata)
 	}
 }

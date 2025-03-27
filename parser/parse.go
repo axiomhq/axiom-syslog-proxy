@@ -143,7 +143,7 @@ func detectMaybeJSON(line []byte) (ok bool, result []byte) {
 // parseJSON takes a single json message to parse
 func parseJSON(data []byte) (*Log, error) {
 	msg := &Log{
-		Metadata: map[string]interface{}{},
+		Metadata: map[string]any{},
 	}
 
 	if err := jsonparser.ObjectEach(data, func(key []byte, value []byte, dataType jsonparser.ValueType, _ int) error {
@@ -270,7 +270,7 @@ func extractSeverity(text string) int32 {
 			return false
 		}
 
-		for j := 0; j < slen; j++ {
+		for j := range slen {
 			c := text[i+j]
 			n := s[j]
 			if c != n && c != 'A'+n-'a' {

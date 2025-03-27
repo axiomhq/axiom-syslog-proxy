@@ -1,7 +1,6 @@
 # TOOLCHAIN
 GO	  := CGO_ENABLED=0 go
 CGO	  := CGO_ENABLED=1 go
-GOFMT := $(GO)fmt
 
 # ENVIRONMENT
 VERBOSE	=
@@ -12,9 +11,6 @@ BUILD_DATE	:= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 REVISION	:= $(shell git rev-parse --short HEAD)
 RELEASE		:= $(shell git describe --tags 2>/dev/null || git rev-parse --short HEAD)-dev
 USER		:= $(shell whoami)
-
-# GO TOOLS
-GOTOOLS := $(shell cat tools.go | grep "_ \"" | awk '{ print $$2 }' | tr -d '"')
 
 # MISC
 COVERPROFILE	:= coverage.out
@@ -45,8 +41,6 @@ ifdef VERBOSE
 endif
 
 # FUNCTIONS
-# func go-run-tool(name)
-go-run-tool = $(CGO) run $(shell echo $(GOTOOLS) | tr ' ' '\n' | grep -w $1)
 # func go-list-pkg-sources(package)
 go-list-pkg-sources = $(GO) list -f '{{range .GoFiles}}{{$$.Dir}}/{{.}} {{end}}' $(1)
 # func go-pkg-sourcefiles(package)
@@ -58,7 +52,7 @@ all: dep fmt lint test build ## Run dep, fmt, lint, test and build
 .PHONY: build
 build: dep.stamp $(call go-pkg-sourcefiles, ./...) ## Build the binaries
 	@echo ">> building binaries"
-	@$(call go-run-tool, goreleaser) build $(GORELEASER_FLAGS)
+	@$(GO) tool goreleaser build $(GORELEASER_FLAGS)
 
 .PHONY: clean
 clean: ## Remove build and test artifacts
@@ -78,13 +72,7 @@ dep-clean: ## Remove obsolete dependencies
 .PHONY: dep-upgrade
 dep-upgrade: ## Upgrade all direct dependencies to their latest version
 	@echo ">> upgrading dependencies"
-	@$(GO) get -d $(shell $(GO) list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all)
-	@make dep
-
-.PHONY: dep-upgrade-tools
-dep-upgrade-tools: ## Upgrade all tool dependencies to their latest version
-	@echo ">> upgrading tool dependencies"
-	@$(GO) get -d $(GOTOOLS)
+	@$(GO) get $(shell $(GO) list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all)
 	@make dep
 
 .PHONY: dep
@@ -97,9 +85,9 @@ dep.stamp: $(GOMODDEPS)
 	@touch $@
 
 .PHONY: fmt
-fmt: ## Format and simplify the source code using `gofmt`
+fmt: ## Format and simplify the source code using `golangci-lint fmt`
 	@echo ">> formatting code"
-	@! $(GOFMT) -s -w $(shell find . -path -prune -o -name '*.go' -print) | grep '^'
+	@$(GO) tool golangci-lint fmt
 
 .PHONY: install
 install: $(GOPATH)/bin/axiom-syslog-proxy ## Install the binary into the $GOPATH/bin directory
@@ -107,12 +95,12 @@ install: $(GOPATH)/bin/axiom-syslog-proxy ## Install the binary into the $GOPATH
 .PHONY: lint
 lint: ## Lint the source code
 	@echo ">> linting code"
-	@$(call go-run-tool, golangci-lint) run
+	@$(GO) tool golangci-lint run
 
 .PHONY: test
 test: ## Run all tests. Run with VERBOSE=1 to get verbose test output ('-v' flag).
 	@echo ">> running tests"
-	@$(call go-run-tool, gotestsum) $(GOTESTSUM_FLAGS) -- $(GO_TEST_FLAGS) ./...
+	@$(CGO) tool gotestsum $(GOTESTSUM_FLAGS) -- $(GO_TEST_FLAGS) ./...
 
 .PHONY: help
 help:
