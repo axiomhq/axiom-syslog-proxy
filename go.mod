@@ -9,7 +9,7 @@ tool github.com/goreleaser/goreleaser/v2
 tool gotest.tools/gotestsum
 
 require (
-	github.com/axiomhq/axiom-go v0.23.1
+	github.com/axiomhq/axiom-go v0.23.2
 	github.com/axiomhq/logmanager v1.0.6
 	github.com/axiomhq/pkg v0.6.0
 	github.com/buger/jsonparser v1.1.1
@@ -481,7 +481,7 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gotest.tools/gotestsum v1.12.1 // indirect
+	gotest.tools/gotestsum v1.12.2 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 	mvdan.cc/gofumpt v0.7.0 // indirect
