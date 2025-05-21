@@ -9,7 +9,7 @@ tool github.com/goreleaser/goreleaser/v2
 tool gotest.tools/gotestsum
 
 require (
-	github.com/axiomhq/axiom-go v0.23.2
+	github.com/axiomhq/axiom-go v0.23.3
 	github.com/axiomhq/logmanager v1.0.6
 	github.com/axiomhq/pkg v0.6.0
 	github.com/buger/jsonparser v1.1.1
