@@ -14,7 +14,7 @@ require (
 	github.com/axiomhq/pkg v0.6.0
 	github.com/buger/jsonparser v1.1.1
 	github.com/stretchr/testify v1.10.0
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 )
 
 require (
