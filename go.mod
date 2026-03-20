@@ -12,7 +12,7 @@ require (
 	github.com/axiomhq/axiom-go v0.23.3
 	github.com/axiomhq/logmanager v1.1.1
 	github.com/axiomhq/pkg v0.6.0
-	github.com/buger/jsonparser v1.1.1
+	github.com/buger/jsonparser v1.1.2
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/zap v1.27.1
 )
