@@ -686,7 +686,7 @@ func processText(data []byte) (bool, string) {
 				return code
 			}
 			ch := (oct / 10 * 8) + oct%10
-			return []byte{byte(ch)}
+			return []byte{byte(ch)} //nolint:gosec // escapedCtrlCharsRegex limits ch to 9, 10 or 13.
 		})
 	}
 
