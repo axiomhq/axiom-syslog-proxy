@@ -681,12 +681,8 @@ func processText(data []byte) (bool, string) {
 	}
 	if idx := bytes.Index(trimmed, []byte("#01")); idx >= 0 && idx+3 < len(trimmed) {
 		trimmed = escapedCtrlCharsRegex.ReplaceAllFunc(trimmed, func(code []byte) []byte {
-			oct, err := ParseInt(code[1:])
-			if err != nil {
-				return code
-			}
-			ch := (oct / 10 * 8) + oct%10
-			return []byte{byte(ch)}
+			// The regex matches "#01" and one octal digit.
+			return []byte{010 + code[3] - '0'}
 		})
 	}
 
