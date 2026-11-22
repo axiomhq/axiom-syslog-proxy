@@ -39,6 +39,10 @@ linters:
       - common-false-positives
       - legacy
       - std-error-handling
+    rules:
+      - path: _test\.go
+        linters:
+          - goconst
     paths:
       - .git
       - .github
