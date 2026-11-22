@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -92,9 +93,9 @@ func detectMaybeJSON(line []byte) (ok bool, result []byte) {
 	// search backwards for } as json messages are always going to end
 	// with }
 	var farIndex int
-	for i := len(line) - 1; i >= 0; i-- {
+	for i, l := range slices.Backward(line) {
 		// Note: not unicode safe, but will always fail if unicode characters are present
-		switch line[i] {
+		switch l {
 		case ' ':
 			continue
 		case '}':
