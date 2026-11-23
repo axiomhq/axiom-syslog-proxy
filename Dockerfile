@@ -3,7 +3,8 @@ FROM gcr.io/distroless/static-debian12
 LABEL maintainer="Axiom, Inc. <info@axiom.co>"
 
 # Copy binary into image.
-COPY axiom-syslog-proxy /usr/bin/axiom-syslog-proxy
+ARG TARGETPLATFORM
+COPY $TARGETPLATFORM/axiom-syslog-proxy /usr/bin/axiom-syslog-proxy
 
 # Use the project name as working directory.
 WORKDIR /axiom-syslog-proxy
